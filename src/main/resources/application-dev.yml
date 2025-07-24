@@ -1,0 +1,44 @@
+server:
+  port: 80
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+spring:
+  mvc:
+    view:
+      prefix: /views/
+      suffix: .jsp
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/shopdb?characterEncoding=utf8
+    username: smuser
+    password: 111111
+
+mybatis:
+  type-aliases-package: edu.sm.dto
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+
+
+app:
+  dir:
+    imgsdir: file:///C:/Code/sm25spring/20250710    # 화면 출력 용
+    uploadimgsdir: C:/Code/sm25spring/20250710    # 파일 Write 용
+
+
+
+
+
+
+
+
+
+
+
+
