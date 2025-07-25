@@ -23,7 +23,7 @@
 
 [//]: # (<br/>)
 
-# 1. Project Overview (프로젝트 개요)
+# 1. Project Overview (프로젝트 개요)1
 - 프로젝트 이름: Auctionary
 - 프로젝트 설명: 사용자 참여형 경매 플랫폼
 
