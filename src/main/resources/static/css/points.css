@@ -1,0 +1,362 @@
+/* Points Page Styles */
+.points-container {
+    padding: 32px 0;
+}
+
+/* Points Overview */
+.points-overview {
+    margin-bottom: 32px;
+}
+
+.points-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 32px;
+}
+
+.points-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.points-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.points-header p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.points-balance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.balance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.balance-label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.balance-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.balance-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Points History Section */
+.points-history-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.section-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-btn {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.filter-btn.active {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+/* Points History List */
+.points-history-list {
+    padding: 24px;
+}
+
+.points-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.points-history-item:hover {
+    background-color: #f9fafb;
+}
+
+.points-history-item:last-child {
+    border-bottom: none;
+}
+
+.points-history-info {
+    flex: 1;
+}
+
+.points-history-description {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.points-history-date {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.points-history-amount {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.points-history-amount.positive {
+    color: #059669;
+}
+
+.points-history-amount.negative {
+    color: #dc2626;
+}
+
+.points-history-type {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+.points-history-type.charge {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.points-history-type.withdraw {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.points-history-type.bid {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.points-history-type.purchase {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.points-history-type.sale {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: #374151;
+}
+
+.modal-form {
+    padding: 24px;
+}
+
+.modal-form .form-group {
+    margin-bottom: 20px;
+}
+
+.modal-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.modal-form input,
+.modal-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.modal-form small {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .points-balance {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+    
+    .filter-btn {
+        flex-shrink: 0;
+    }
+    
+    .balance-amount {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .points-card {
+        padding: 20px;
+    }
+    
+    .points-header h1 {
+        font-size: 24px;
+    }
+    
+    .balance-amount {
+        font-size: 24px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+    }
+} 

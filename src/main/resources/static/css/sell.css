@@ -1,0 +1,293 @@
+/* Sell Page Styles */
+.sell-container {
+    padding: 32px 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sell-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.sell-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.sell-header p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* Form Styles */
+.sell-form {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.form-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Image Upload */
+.image-upload {
+    margin-bottom: 20px;
+}
+
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f9fafb;
+}
+
+.upload-area:hover {
+    border-color: #2563eb;
+    background-color: #f0f9ff;
+}
+
+.upload-area svg {
+    width: 48px;
+    height: 48px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+
+.upload-area p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+}
+
+.upload-area.dragover {
+    border-color: #2563eb;
+    background-color: #f0f9ff;
+}
+
+.image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.preview-image {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-image .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.preview-image .remove-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Form Actions */
+.form-actions {
+    padding: 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Preview Modal */
+.preview-modal {
+    max-width: 600px;
+    max-height: 80vh;
+}
+
+.preview-content {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.preview-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.preview-item-image {
+    width: 100%;
+    height: 200px;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.preview-item-content {
+    padding: 20px;
+}
+
+.preview-item-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.preview-item-description {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.preview-item-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.preview-item-detail {
+    display: flex;
+    justify-content: space-between;
+}
+
+.preview-item-detail .label {
+    color: #6b7280;
+}
+
+.preview-item-detail .value {
+    color: #111827;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    .preview-item-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .sell-container {
+        padding: 16px 0;
+    }
+    
+    .form-section {
+        padding: 16px;
+    }
+    
+    .sell-header h1 {
+        font-size: 24px;
+    }
+    
+    .upload-area {
+        padding: 24px 16px;
+    }
+    
+    .upload-area svg {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .image-preview {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+} 

@@ -1,0 +1,183 @@
+/* Header Styles */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 16px;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #111827;
+    font-weight: 700;
+    font-size: 18px;
+    margin-right: 24px;
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+    color: #2563eb;
+}
+
+.logo-text {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .logo-text {
+        display: inline;
+    }
+}
+
+/* Search Container */
+.search-container {
+    position: relative;
+    flex: 1;
+    margin-right: 16px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.nav-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.points-text {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .points-text {
+        display: inline;
+    }
+}
+
+/* Auth Buttons */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-content {
+        gap: 8px;
+    }
+    
+    .search-container {
+        margin-right: 8px;
+    }
+    
+    .nav {
+        gap: 2px;
+    }
+    
+    .nav-btn {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+    
+    .auth-buttons {
+        gap: 4px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 640px) {
+    .nav-btn span {
+        display: none;
+    }
+    
+    .nav-btn {
+        padding: 8px;
+    }
+    
+    .auth-buttons .btn span {
+        display: none;
+    }
+    
+    .auth-buttons .btn {
+        padding: 8px;
+        min-width: 40px;
+    }
+} 

@@ -1,158 +1,113 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <title>Bootstrap 4 Website Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    .fakeimg {
-      height: 150px;
-      background: #aaa;
-    }
-  </style>
-  <script>
-    let index = {
-      init:function(){
-        let url = '/gettime';
-        $.ajax({
-          url:url,
-          success:(data)=>{
-            $('#ctime').text(data);
-          },
-          error:()=>{}
-        });
-        setInterval(()=>{
-          $.ajax({
-            url:url,
-            success:(data)=>{
-              $('#ctime').text(data);
-            },
-            error:()=>{}
-          });
-        }, 1000);
-
-      }
-    }
-    $().ready(()=>{
-      index.init();
-    });
-
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctionary - 게임처럼 즐기는 C2C 경매 플랫폼</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/auction-card.css">
 </head>
 <body>
-<ul class="nav justify-content-end">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                        <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+                    </svg>
+                    <span class="logo-text">Auctionary</span>
+                </a>
+                
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" placeholder="어떤 상품을 찾으시나요?" class="search-input">
+                </div>
+                
+                <nav class="nav">
+                    <button class="nav-btn" id="chatBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </button>
+                    <a href="/points" class="nav-btn" id="pointsBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect width="20" height="12" x="2" y="6" rx="2"/>
+                            <circle cx="12" cy="12" r="4"/>
+                        </svg>
+                        <span class="points-text">0 P</span>
+                    </a>
+                    <a href="/sell" class="nav-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                        <span>판매하기</span>
+                    </a>
+                    <a href="/my-page" class="nav-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>마이페이지</span>
+                    </a>
+                </nav>
+                
+                <div class="auth-buttons">
+                    <a href="/login" class="btn btn-ghost">로그인</a>
+                    <a href="/signup" class="btn btn-primary">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  <c:choose>
-    <c:when test="${sessionScope.logincust == null}">
-      <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/register">Register</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/about">About Us</a>
-      </li>
-    </c:when>
-    <c:otherwise>
-      <li class="nav-item">
-        <a class="nav-link" href="/info">${sessionScope.logincust.custName}</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
-    </c:otherwise>
-  </c:choose>
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="hero-section">
+                <h1 class="hero-title">실시간 경매</h1>
+                <p class="hero-subtitle">지금 바로 참여하고 특별한 아이템을 차지하세요!</p>
+            </div>
+            
+            <div class="sort-buttons">
+                <button class="sort-btn active" data-sort="closing">마감임박순</button>
+                <button class="sort-btn" data-sort="popular">인기순</button>
+                <button class="sort-btn" data-sort="newest">최신순</button>
+                <button class="sort-btn" data-sort="highPrice">높은가격순</button>
+                <button class="sort-btn" data-sort="lowPrice">낮은가격순</button>
+            </div>
+            
+            <div class="auction-grid" id="auctionGrid">
+                <!-- Auction cards will be dynamically generated here -->
+            </div>
+        </div>
+    </main>
 
+    <!-- Chat Modal -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-modal-content">
+            <div class="chat-modal-header">
+                <h3>채팅</h3>
+                <button class="close-btn" id="closeChatBtn">&times;</button>
+            </div>
+            <div class="chat-list" id="chatList">
+                <!-- Chat conversations will be loaded here -->
+            </div>
+        </div>
+    </div>
 
-</ul>
-<%-- Header Start --%>
-<div class="jumbotron text-center" style="margin-bottom:0">
-  <h1>HTML5 & JavaScript</h1>
-  <p>HTML5, CSS, JavaScript, jQuery, AJAX</p>
-  <p id="ctime"></p>
-</div>
-<%-- Header End --%>
-
-
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <a class="navbar-brand" href="/">Home</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="/html">HTML</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/css">CSS</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/js">JS</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/jq">JQuery</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/ajax">AJAX</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/productitem">ProductItem</a>
-      </li>
-      <c:if test="${sessionScope.logincust.custId == 'admin'}">
-        <li class="nav-item">
-          <a class="nav-link" href="/cust">Cust</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/product">Product</a>
-        </li>
-      </c:if>
-
-    </ul>
-  </div>
-</nav>
-
-<div class="container" style="margin-top:30px; margin-bottom: 30px;">
-  <div class="row">
-    <%-- Left Menu Start ........  --%>
-    <c:choose>
-      <c:when test="${left == null}">
-        <jsp:include page="left.jsp"/>
-      </c:when>
-      <c:otherwise>
-        <jsp:include page="${left}.jsp"/>
-      </c:otherwise>
-    </c:choose>
-
-    <%-- Left Menu End ........  --%>
-      <c:choose>
-        <c:when test="${center == null}">
-          <jsp:include page="center.jsp"/>
-        </c:when>
-        <c:otherwise>
-          <jsp:include page="${center}.jsp"/>
-        </c:otherwise>
-      </c:choose>
-    <%-- Center Start ........  --%>
-
-    <%-- Center End ........  --%>
-  </div>
-</div>
-
-<div class="text-center" style="background-color:black; color: white; margin-bottom:0; max-height: 50px;">
-  <p>Footer</p>
-</div>
-
+    <script src="/js/mock-data.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/auction-card.js"></script>
+    <script src="/js/main.js"></script>
 </body>
-</html>
+</html> 
