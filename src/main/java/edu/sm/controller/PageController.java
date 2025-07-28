@@ -2,7 +2,10 @@
 package edu.sm.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class PageController {
@@ -35,5 +38,11 @@ public class PageController {
     @GetMapping("/sell")
     public String sell() {
         return "pages/sell";
+    }
+
+    @GetMapping("/auction-detail")
+    public String detail(@RequestParam("id") String id, Model model) {
+        model.addAttribute("id", id);
+        return "pages/auction-detail";
     }
 }
