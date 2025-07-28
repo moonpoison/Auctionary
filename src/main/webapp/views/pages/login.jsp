@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 - Auctionary</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <a href="../index" class="logo">
+                <a href="/" class="logo">
                     <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 12l2 2 4-4"/>
                         <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
@@ -38,8 +38,8 @@
                     
                     <form class="auth-form" id="loginForm">
                         <div class="form-group">
-                            <label for="email">이메일</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="userId">아이디</label>
+                            <input type="text" id="userId" name="userId" required>
                         </div>
                         
                         <div class="form-group">
@@ -51,22 +51,22 @@
                     </form>
                     
                     <div class="auth-footer">
-                        <p>계정이 없으신가요? <a href="signup">회원가입</a></p>
+                        <p>계정이 없으신가요? <a href="/auth/signup">회원가입</a></p>
                     </div>
                     
                     <div class="demo-accounts">
                         <h3>데모 계정</h3>
                         <div class="demo-account-list">
-                            <button class="demo-account-btn" onclick="loginWithDemo('hero@auctionary.com')">
+                            <button class="demo-account-btn" onclick="loginWithDemo('hero')">
                                 AuctionHero (8,400,000P)
                             </button>
-                            <button class="demo-account-btn" onclick="loginWithDemo('vtech@auctionary.com')">
+                            <button class="demo-account-btn" onclick="loginWithDemo('vtech')">
                                 V-Tech (5,000,000P)
                             </button>
-                            <button class="demo-account-btn" onclick="loginWithDemo('timemaster@auctionary.com')">
+                            <button class="demo-account-btn" onclick="loginWithDemo('timemaster')">
                                 TimeMaster (20,000,000P)
                             </button>
-                            <button class="demo-account-btn" onclick="loginWithDemo('collector@auctionary.com')">
+                            <button class="demo-account-btn" onclick="loginWithDemo('collector')">
                                 Collector (8,000,000P)
                             </button>
                         </div>
@@ -76,9 +76,9 @@
         </div>
     </main>
 
-    <script src="../js/mock-data.js"></script>
-    <script src="../js/utils.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/login.js"></script>
+    <script src="/js/mock-data.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html> 

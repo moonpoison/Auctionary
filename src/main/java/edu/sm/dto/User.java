@@ -13,9 +13,12 @@ import java.sql.Timestamp;
 @Data
 public class User {
     private String userId;
+    private String name;
     private String password;
-    private Timestamp birthDate;
+    private String birthDate;
     private String phoneNumber;
     private String email;
     private String role;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }
