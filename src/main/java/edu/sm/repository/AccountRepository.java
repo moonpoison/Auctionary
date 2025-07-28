@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface CustRepository {
+public interface AccountRepository {
     
     void insert(User user) throws Exception;
     

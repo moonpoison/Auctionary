@@ -1,10 +1,9 @@
 package edu.sm.controller;
 
 import edu.sm.dto.User;
-import edu.sm.service.CustService;
+import edu.sm.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
-    private CustService custService;
+    private AccountService accountService;
 
     // 회원가입 페이지
     @GetMapping("/signup")
@@ -40,7 +39,7 @@ public class AuthController {
         
         try {
             // 중복 아이디 체크
-            User existingUser = custService.select(user.getUserId());
+            User existingUser = accountService.select(user.getUserId());
             if (existingUser != null) {
                 response.put("success", false);
                 response.put("message", "이미 존재하는 아이디입니다.");
@@ -48,7 +47,7 @@ public class AuthController {
             }
             
             // 중복 이메일 체크
-            List<User> allUsers = custService.selectAll();
+            List<User> allUsers = accountService.selectAll();
             for (User existing : allUsers) {
                 if (existing.getEmail().equals(user.getEmail())) {
                     response.put("success", false);
@@ -62,7 +61,7 @@ public class AuthController {
             user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             
             // 회원가입 처리
-            custService.insert(user);
+            accountService.insert(user);
             
             response.put("success", true);
             response.put("message", "회원가입이 완료되었습니다.");
@@ -85,7 +84,7 @@ public class AuthController {
             String password = loginData.get("password");
             
             // 사용자 조회
-            User user = custService.select(userId);
+            User user = accountService.select(userId);
             
             if (user == null) {
                 response.put("success", false);

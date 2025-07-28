@@ -1,7 +1,7 @@
 package edu.sm.service;
 
 import edu.sm.dto.User;
-import edu.sm.repository.CustRepository;
+import edu.sm.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,27 +9,27 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CustService {
+public class AccountService {
 
-    final CustRepository custRepository;
+    final AccountRepository accountRepository;
 
     public void insert(User user) throws Exception {
-        custRepository.insert(user);
+        accountRepository.insert(user);
     }
 
     public void update(User user) throws Exception {
-        custRepository.update(user);
+        accountRepository.update(user);
     }
 
     public void delete(String userId) throws Exception {
-        custRepository.delete(userId);
+        accountRepository.delete(userId);
     }
 
     public List<User> selectAll() throws Exception {
-        return custRepository.selectAll();
+        return accountRepository.selectAll();
     }
 
     public User select(String userId) throws Exception {
-        return custRepository.select(userId);
+        return accountRepository.select(userId);
     }
 }

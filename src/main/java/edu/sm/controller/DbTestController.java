@@ -1,6 +1,6 @@
 package edu.sm.controller;
 
-import edu.sm.service.CustService;
+import edu.sm.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +24,7 @@ public class DbTestController {
     private DataSource dataSource;
 
     @Autowired
-    private CustService custService;
+    private AccountService accountService;
 
     // 데이터베이스 연결 테스트
     @GetMapping("/db-connection")
@@ -64,7 +64,7 @@ public class DbTestController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            List<edu.sm.dto.User> users = custService.selectAll();
+            List<edu.sm.dto.User> users = accountService.selectAll();
             result.put("success", true);
             result.put("message", "User 테이블 조회 성공!");
             result.put("userCount", users.size());
@@ -85,7 +85,7 @@ public class DbTestController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            edu.sm.dto.User user = custService.select(userId);
+            edu.sm.dto.User user = accountService.select(userId);
             if (user != null) {
                 result.put("success", true);
                 result.put("message", "사용자 조회 성공!");

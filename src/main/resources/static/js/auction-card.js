@@ -8,18 +8,19 @@ class AuctionCard {
     createCard() {
         const currentPrice = getCurrentPrice(this.item);
         const timeLeft = formatTimeRemaining(this.item.endDate);
-        const isItemWishlisted = isWishlisted(authManager.getUser(), this.item.id);
+        const user = authManager.getUser();
+        const isWishlisted = user && user.wishlist && user.wishlist.includes(this.item.id);
         
         const card = document.createElement('div');
         card.className = 'auction-card';
         card.innerHTML = `
-            <a href="pages/auction/${this.item.id}" class="auction-card-link">
+            <a href="auction-detail?id=${this.item.id}" class="auction-card-link">
                 <div class="auction-card-image">
                     <img src="${this.item.images[0] || 'images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
                     <div class="auction-card-badge ${timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1) ? 'urgent' : ''}">
                         ${timeLeft.text}
                     </div>
-                    <button class="auction-card-wishlist ${isItemWishlisted ? 'active' : ''}" 
+                    <button class="auction-card-wishlist ${isWishlisted ? 'active' : ''}" 
                             onclick="event.preventDefault(); event.stopPropagation(); auctionCardManager.toggleWishlist('${this.item.id}', this)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -70,8 +71,23 @@ class AuctionCardManager {
     
     // Render all auction cards
     renderCards(items, container) {
+        console.log('Rendering cards for items:', items);
+        console.log('Container:', container);
+        
+        if (!container) {
+            console.error('Container is null');
+            return;
+        }
+        
         container.innerHTML = '';
+        
+        if (!items || items.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color: #6b7280;">표시할 상품이 없습니다.</div>';
+            return;
+        }
+        
         items.forEach(item => {
+            console.log('Creating card for item:', item);
             const card = this.createCard(item);
             container.appendChild(card);
         });
