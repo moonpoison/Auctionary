@@ -8,18 +8,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Handle signup form submission
-function handleSignup(e) {
+async function handleSignup(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
+    const userId = formData.get('userId');
     const name = formData.get('name');
+    const birthDate = formData.get('birthDate');
     const email = formData.get('email');
     const phone = formData.get('phone');
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
     
     // Validation
-    if (!name || !email || !phone || !password || !confirmPassword) {
+    if (!userId || !name || !birthDate || !email || !phone || !password || !confirmPassword) {
         showMessage('모든 필드를 입력해주세요.', 'error');
         return;
     }
@@ -34,35 +36,36 @@ function handleSignup(e) {
         return;
     }
     
-    // Check if email already exists
-    const existingUser = MOCK_USERS.find(user => user.email === email);
-    if (existingUser) {
-        showMessage('이미 사용 중인 이메일입니다.', 'error');
-        return;
+    try {
+        const response = await fetch('/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId,
+                name: name,
+                birthDate: birthDate,
+                email: email,
+                phoneNumber: phone,
+                password: password
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showMessage(result.message, 'success');
+            setTimeout(() => {
+                window.location.href = '/auth/login';
+            }, 1000);
+        } else {
+            showMessage(result.message, 'error');
+        }
+    } catch (error) {
+        showMessage('회원가입 중 오류가 발생했습니다.', 'error');
+        console.error('Signup error:', error);
     }
-    
-    // Create new user
-    const newUser = {
-        id: `user-${Date.now()}`,
-        name: name,
-        email: email,
-        phone: phone,
-        points: 1000000, // Starting points
-        avatar: '../images/placeholder.svg',
-        wishlist: [],
-        reviews: []
-    };
-    
-    // Add to mock users (in real app, this would be saved to database)
-    MOCK_USERS.push(newUser);
-    
-    // Auto login
-    authManager.saveUser(newUser);
-    
-    showMessage('회원가입 성공! 메인 페이지로 이동합니다.', 'success');
-    setTimeout(() => {
-        window.location.href = '../index';
-    }, 1000);
 }
 
 // Show message

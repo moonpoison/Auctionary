@@ -1,23 +1,36 @@
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<!DOCTYPE mapper-->
-<!--        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"-->
-<!--        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
-<!--<mapper namespace="edu.sm.repository.CustRepository">-->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.CustRepository">
 
-<!--    <select id="select" parameterType="String" resultType="Cust">-->
-<!--        SELECT * FROM cust WHERE cust_id=#{custId}-->
-<!--    </select>-->
-<!--    <select id="selectAll" resultType="Cust">-->
-<!--        SELECT * FROM cust-->
-<!--    </select>-->
-<!--    <insert id="insert" parameterType="Cust">-->
-<!--        INSERT INTO cust VALUES (#{custId},#{custPwd},#{custName}, NOW(), NOW())-->
-<!--    </insert>-->
-<!--    <update id="update" parameterType="Cust">-->
-<!--        UPDATE cust SET cust_pwd=#{custPwd},cust_name=#{custName}, cust_update=NOW() WHERE cust_id=#{custId}-->
-<!--    </update>-->
-<!--    <delete id="delete" parameterType="String">-->
-<!--        DELETE FROM cust WHERE cust_id=#{custId}-->
-<!--    </delete>-->
+    <select id="select" parameterType="String" resultType="User">
+        SELECT * FROM User WHERE user_id=#{userId}
+    </select>
+    
+    <select id="selectAll" resultType="User">
+        SELECT * FROM User
+    </select>
+    
+    <insert id="insert" parameterType="User">
+        INSERT INTO User (user_id, name, password, birth_date, phone_number, email, role, created_at, updated_at) 
+        VALUES (#{userId}, #{name}, #{password}, #{birthDate}, #{phoneNumber}, #{email}, #{role}, #{createdAt}, #{updatedAt})
+    </insert>
+    
+    <update id="update" parameterType="User">
+        UPDATE User SET 
+            name=#{name}, 
+            password=#{password}, 
+            birth_date=#{birthDate}, 
+            phone_number=#{phoneNumber}, 
+            email=#{email}, 
+            role=#{role}, 
+            updated_at=#{updatedAt} 
+        WHERE user_id=#{userId}
+    </update>
+    
+    <delete id="delete" parameterType="String">
+        DELETE FROM User WHERE user_id=#{userId}
+    </delete>
 
-<!--</mapper>-->
+</mapper>
