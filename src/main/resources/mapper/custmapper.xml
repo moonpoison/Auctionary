@@ -7,28 +7,28 @@
     <select id="select" parameterType="String" resultType="User">
         SELECT * FROM User WHERE user_id=#{userId}
     </select>
-    
+
     <select id="selectAll" resultType="User">
         SELECT * FROM User
     </select>
-    
+
     <insert id="insert" parameterType="User">
-        INSERT INTO User (user_id, name, password, birth_date, phone_number, email, role, created_at, updated_at) 
+        INSERT INTO User (user_id, name, password, birth_date, phone_number, email, role, created_at, updated_at)
         VALUES (#{userId}, #{name}, #{password}, #{birthDate}, #{phoneNumber}, #{email}, #{role}, #{createdAt}, #{updatedAt})
     </insert>
-    
+
     <update id="update" parameterType="User">
-        UPDATE User SET 
-            name=#{name}, 
-            password=#{password}, 
-            birth_date=#{birthDate}, 
-            phone_number=#{phoneNumber}, 
-            email=#{email}, 
-            role=#{role}, 
-            updated_at=#{updatedAt} 
+        UPDATE User SET
+                        name=#{name},
+                        password=#{password},
+                        birth_date=#{birthDate},
+                        phone_number=#{phoneNumber},
+                        email=#{email},
+                        role=#{role},
+                        updated_at=#{updatedAt}
         WHERE user_id=#{userId}
     </update>
-    
+
     <delete id="delete" parameterType="String">
         DELETE FROM User WHERE user_id=#{userId}
     </delete>
