@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.PointHistoryRepository">
+
+    <resultMap id="pointHistoryResultMap" type="edu.sm.dto.Point_History">
+        <id property="historyId" column="history_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="actionType" column="action_type"/>
+        <result property="pointChange" column="point_change"/>
+        <result property="finalPoint" column="final_point"/>
+        <result property="changeDate" column="change_date"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+    <select id="findByUserId" parameterType="String" resultMap="pointHistoryResultMap">
+        SELECT *
+        FROM Point_History
+        WHERE user_id = #{userId}
+        ORDER BY change_date DESC
+    </select>
+
+</mapper>

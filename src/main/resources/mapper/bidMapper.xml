@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.BidRepository">
+
+    <select id="findRecentActivitiesByUserId" parameterType="String" resultType="edu.sm.dto.ActivityLog">
+        SELECT
+            p.product_name,
+            b.bid_price,
+            b.bid_date
+        FROM Bid b
+                 JOIN Product p ON b.product_id = p.product_id
+        WHERE b.user_id = #{userId}
+        ORDER BY b.bid_date DESC
+            LIMIT 5
+    </select>
+
+</mapper>
