@@ -21,7 +21,8 @@ public class Product {
     private Timestamp auctionEndDate;
     private double startingPrice;
     private double bidUnit;
-    private String registerUserId;
+    private String registerUserId; // 꼭 필요
     private String transactionStatus;
+
 }
 //product_id, product_name, description, image_path, category_id, auction_start_date, acution_end_date, starting_price, bid_unit, register_user_id(user_id), transaction_status

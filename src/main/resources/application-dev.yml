@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8088
   servlet:
     encoding:
       charset: UTF-8
@@ -12,9 +12,17 @@ spring:
       suffix: .jsp
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://my8002.gabiadb.com/doyeondb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: doyeondb
-    password: bang0622@@
+    url: jdbc:mysql://192.168.0.64:3306/auctionary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: tester
+    password: 1234
+
+#    url: jdbc:mysql://localhost:3306/pjt?serverTimezone=UTC&useSSL=false
+#    username: root
+#    password: 111111
+
+#    url: jdbc:mysql://my8002.gabiadb.com/doyeondb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+#    username: doyeondb
+#    password: bang0622@@
 
 mybatis:
   type-aliases-package: edu.sm.dto

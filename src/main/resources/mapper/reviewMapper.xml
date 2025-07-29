@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.ReviewRepository">
+
+    <select id="findReceivedReviewsByUserId" parameterType="String" resultType="Review">
+        SELECT r.*
+        FROM Review r
+                 JOIN Trade_History t ON r.trade_id = t.trade_id
+        WHERE (t.seller_id = #{userId} OR t.buyer_id = #{userId}) AND r.reviewer_id != #{userId}
+        ORDER BY r.review_date DESC
+    </select>
+
+</mapper>

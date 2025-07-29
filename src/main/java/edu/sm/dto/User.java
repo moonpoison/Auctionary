@@ -1,7 +1,6 @@
 package edu.sm.dto;
 
 import lombok.*;
-
 import java.sql.Timestamp;
 
 @AllArgsConstructor
@@ -14,6 +13,7 @@ import java.sql.Timestamp;
 public class User {
     private String userId;
     private String password;
+    private String name;
     private Timestamp birthDate;
     private String phoneNumber;
     private String email;
