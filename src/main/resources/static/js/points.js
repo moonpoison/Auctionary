@@ -2,6 +2,7 @@
 class PointsManager {
     constructor() {
         this.currentFilter = 'all';
+        this.originalHistory = null;
         this.init();
     }
     
@@ -53,7 +54,6 @@ class PointsManager {
     // Set filter
     setFilter(filter) {
         this.currentFilter = filter;
-        
         // Update active filter button
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -66,41 +66,47 @@ class PointsManager {
     
     // Load user points
     loadUserPoints() {
-        const user = authManager.getUser();
-        if (!user) return;
-        
         const currentPointsElement = document.getElementById('currentPoints');
-        if (currentPointsElement) {
-            currentPointsElement.textContent = user.points.toLocaleString() + ' P';
-        }
-        
-        // Update header points
-        const pointsTextElement = document.querySelector('.points-text');
-        if (pointsTextElement) {
-            pointsTextElement.textContent = user.points.toLocaleString() + ' P';
+        const serverFinalPoint = document.getElementById('serverFinalPoint');
+
+        if (currentPointsElement && serverFinalPoint) {
+            const points = serverFinalPoint.value;
+            currentPointsElement.textContent = points.toLocaleString() + ' P';
+
+            // Update header points
+            const pointsTextElement = document.querySelector('.points-text');
+            if (pointsTextElement) {
+                pointsTextElement.textContent = points.toLocaleString() + ' P';
+            }
         }
     }
-    
+
+
     // Load points history
     loadPointsHistory() {
         const historyList = document.getElementById('pointsHistoryList');
+        if (!this.originalHistory) {
+            const serverHistory = document.getElementById('serverPointHistory');
+            if (!serverHistory) return;
+            this.originalHistory = JSON.parse(serverHistory.value);
+        }
+
         if (!historyList) return;
-        
+
         const user = authManager.getUser();
         if (!user) return;
-        
-        // Mock points history
-        const history = [
-            { type: 'charge', amount: 10000000, description: '계좌이체 충전', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
-            { type: 'purchase', amount: -8600000, description: "'빈티지 롤렉스' 낙찰", date: new Date(Date.now() - 10 * 60 * 1000) },
-            { type: 'bid_place', amount: -1600000, description: "'사이버펑크 그래픽카드' 입찰", date: new Date(Date.now() - 3 * 60 * 60 * 1000) },
-            { type: 'sale', amount: 250000, description: "'슈퍼 패미컴' 판매 완료", date: new Date(Date.now() - 1 * 60 * 60 * 1000) },
-            { type: 'withdraw', amount: -500000, description: '계좌 출금', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-            { type: 'charge', amount: 5000000, description: '신용카드 충전', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-        ];
-        
+
+        // Parse point history
+        const history = this.originalHistory.map(item => ({
+            type: item.actionType.toLowerCase(),
+            amount: item.pointChange,
+            description: item.note,
+            date: new Date(item.changeDate)
+        }));
+
         // Filter history based on current filter
         let filteredHistory = history;
+
         if (this.currentFilter !== 'all') {
             filteredHistory = history.filter(item => {
                 switch (this.currentFilter) {
@@ -119,32 +125,31 @@ class PointsManager {
                 }
             });
         }
-        
+
         if (filteredHistory.length === 0) {
             historyList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">내역이 없습니다.</p>';
             return;
         }
-        
+
         historyList.innerHTML = filteredHistory.map(item => {
             const typeClass = this.getTypeClass(item.type);
             const typeLabel = this.getTypeLabel(item.type);
-            
+
             return `
-                <div class="points-history-item">
-                    <div class="points-history-info">
-                        <div class="points-history-description">${item.description}</div>
-                        <div class="points-history-date">${this.formatTime(item.date)}</div>
-                    </div>
-                    <div class="points-history-amount ${item.amount > 0 ? 'positive' : 'negative'}">
-                        ${item.amount > 0 ? '+' : ''}${formatPrice(item.amount)}
-                        <span class="points-history-type ${typeClass}">${typeLabel}</span>
-                    </div>
+            <div class="points-history-item">
+                <div class="points-history-info">
+                    <div class="points-history-description">${item.description}</div>
+                    <div class="points-history-date">${this.formatTime(item.date)}</div>
                 </div>
-            `;
+                <div class="points-history-amount ${item.amount > 0 ? 'positive' : 'negative'}">
+                    ${item.amount > 0 ? '+' : ''}${formatPrice(item.amount)}
+                    <span class="points-history-type ${typeClass}">${typeLabel}</span>
+                </div>
+            </div>
+        `;
         }).join('');
     }
-    
-    // Get type class for styling
+
     getTypeClass(type) {
         switch (type) {
             case 'charge':
@@ -161,7 +166,7 @@ class PointsManager {
                 return '';
         }
     }
-    
+
     // Get type label
     getTypeLabel(type) {
         switch (type) {

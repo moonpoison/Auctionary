@@ -18,7 +18,7 @@ class DataBaseTest {
     @PostConstruct
     public void testConnection() {
         try {
-            String result = jdbcTemplate.queryForObject("SELECT NOW()", String.class);
+            String result = jdbcTemplate.queryForObject("select final_point from point_history where user_id='user01' order by change_date desc limit 1;", String.class);
             System.out.println("✅ DB 연결 성공: 현재 시간 = " + result);
         } catch (Exception e) {
             System.err.println("❌ DB 연결 실패: " + e.getMessage());

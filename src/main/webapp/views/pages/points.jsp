@@ -89,7 +89,8 @@
                         <div class="points-balance">
                             <div class="balance-info">
                                 <span class="balance-label">현재 포인트</span>
-                                <span class="balance-amount" id="currentPoints">0 P</span>
+                                <input type="hidden" id="serverFinalPoint" value="${finalPoint}">
+                                <span class="balance-amount" id="currentPoints">${finalPoint} P</span>
                             </div>
                             <div class="balance-actions">
                                 <button class="btn btn-primary" onclick="pointsManager.showChargeModal()">충전하기</button>
@@ -112,6 +113,7 @@
                             <button class="filter-btn" data-filter="sale">판매</button>
                         </div>
                     </div>
+                    <input type="hidden" id="serverPointHistory" value='${list}'>
                     <div class="points-history-list" id="pointsHistoryList">
                         <!-- Points history will be loaded here -->
                     </div>
@@ -180,4 +182,4 @@
     <script src="../js/auth.js"></script>
     <script src="../js/points.js"></script>
 </body>
-</html> 
+</html>
