@@ -116,7 +116,7 @@
                             <input type="text" id="itemTags" name="tags" placeholder="태그를 쉼표로 구분하여 입력하세요 (예: 한정판, 레트로, 게임기)">
                         </div>
                     </div>
-                    
+
                     <div class="form-section">
                         <h3>이미지</h3>
                         <div class="image-upload">
@@ -146,11 +146,6 @@
                                 <label for="bidIncrement">입찰 단위 *</label>
                                 <input type="number" id="bidIncrement" name="bidIncrement" min="1000" step="1000" required placeholder="입찰 단위를 입력하세요">
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="buyNowPrice">즉시구매가 (선택사항)</label>
-                            <input type="number" id="buyNowPrice" name="buyNowPrice" min="1000" step="1000" placeholder="즉시구매가를 입력하세요">
                         </div>
                         
                         <div class="form-row">

@@ -67,25 +67,64 @@ class SellManager {
             });
         }
     }
-    
+
+    // 이미지 파일을 서버에 업로드하고 저장된 파일명을 반환
+    async uploadImageToServer(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/upload/image', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const filename = await response.text();
+                console.log('✅ 이미지 서버 업로드 성공:', filename);
+                return filename;
+            } else {
+                const errorText = await response.text();
+                console.error('❌ 이미지 업로드 실패:', errorText);
+                alert('이미지 업로드 실패: ' + errorText);
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ 이미지 업로드 중 오류:', error);
+            alert('네트워크 오류로 이미지 업로드에 실패했습니다.');
+            return null;
+        }
+    }
+
+
     // Handle file selection
-    handleFileSelection(files) {
-        Array.from(files).forEach(file => {
+    // 파일 선택 시 이미지 미리보기 및 서버 업로드
+    async handleFileSelection(files) {
+        for (let file of files) {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
+
+                reader.onload = async (e) => {
+                    // 이미지 서버 업로드
+                    const uploadedFilename = await this.uploadImageToServer(file);
+                    if (!uploadedFilename) return;
+
+                    // 업로드된 서버 이미지 정보를 저장
                     this.uploadedImages.push({
                         id: Date.now() + Math.random(),
                         src: e.target.result,
-                        name: file.name
+                        name: uploadedFilename  // 서버 파일명 저장
                     });
+
                     this.updateImagePreview();
                 };
+
                 reader.readAsDataURL(file);
             }
-        });
+        }
     }
-    
+
+
     // Update image preview
     updateImagePreview() {
         const imagePreview = document.getElementById('imagePreview');
@@ -290,7 +329,6 @@ class SellManager {
     // Create auction item
     createAuctionItem(data) {
         const user = authManager.getUser();
-        console.log('data.endDate:', data.endDate); // Debugging line
         const auctionEndDate = data.endDate ? new Date(data.endDate) : null;
 
         return {

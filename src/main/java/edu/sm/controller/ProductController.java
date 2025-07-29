@@ -6,11 +6,13 @@ import edu.sm.dto.User;
 import edu.sm.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping; // GetMapping import 추가
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Enumeration;
+import java.util.List; // List import 추가
 
 @RestController
 @RequestMapping("/api/products")
@@ -39,5 +41,10 @@ public class ProductController {
             throw new RuntimeException("로그인된 사용자만 상품을 등록할 수 있습니다.");
         }
         return productService.createProduct(product);
+    }
+
+    @GetMapping // 모든 상품 조회 엔드포인트 추가
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
     }
 }

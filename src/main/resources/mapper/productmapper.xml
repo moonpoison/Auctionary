@@ -9,4 +9,9 @@
         VALUES (#{userId}, #{productName}, #{description}, #{imagePath}, #{categoryId}, #{auctionStartDate}, #{auctionEndDate}, #{startingPrice}, #{bidUnit}, #{transactionStatus})
     </insert>
 
+    <select id="selectAll" resultType="edu.sm.dto.Product">
+        SELECT product_id, user_id, product_name, description, image_path, category_id, auction_start_date, auction_end_date, starting_price, bid_unit, transaction_status
+        FROM product
+    </select>
+
 </mapper>
