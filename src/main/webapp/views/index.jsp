@@ -107,6 +107,7 @@
     <script src="/js/mock-data.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/chat.js"></script>
     <script src="/js/auction-card.js"></script>
     <script src="/js/main.js"></script>
 </body>

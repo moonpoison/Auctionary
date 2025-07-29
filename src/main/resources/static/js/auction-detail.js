@@ -255,7 +255,55 @@ class AuctionDetailManager {
             return;
         }
         
-        alert('채팅 기능은 준비 중입니다.');
+        const user = authManager.getUser();
+        if (!user) {
+            alert('사용자 정보를 가져올 수 없습니다.');
+            return;
+        }
+        
+        // 판매자와 채팅 시작
+        const sellerId = this.currentItem.sellerId;
+        const productId = this.currentItem.id.replace('item-', ''); // item-123 -> 123
+        
+        // 채팅방 생성 또는 조회
+        this.createOrGetChatRoom(user.userId, sellerId, productId);
+    }
+    
+    async createOrGetChatRoom(buyerId, sellerId, productId) {
+        try {
+            const response = await fetch('/api/chat/conversations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    senderId: buyerId,
+                    receiverId: sellerId,
+                    productId: parseInt(productId)
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to create chat room');
+            }
+            
+            const chatRoom = await response.json();
+            
+            // 채팅 모달 열기
+            if (window.chatManager) {
+                window.chatManager.openChatModal();
+                // 특정 채팅방으로 이동
+                setTimeout(() => {
+                    window.chatManager.openChat(chatRoom.chatId);
+                }, 100);
+            } else {
+                alert('채팅 매니저를 찾을 수 없습니다.');
+            }
+            
+        } catch (error) {
+            console.error('Error creating chat room:', error);
+            alert('채팅방을 생성하는데 실패했습니다.');
+        }
     }
     
     startCountdown() {

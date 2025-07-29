@@ -173,9 +173,18 @@ class AuctionApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('=== main.js DOMContentLoaded ===');
+    
     // AuthManager 초기화
     if (authManager) {
+        console.log('Initializing authManager...');
         await authManager.init();
+        console.log('authManager initialized');
+        
+        // UI 업데이트 강제 호출
+        console.log('Forcing UI update...');
+        authManager.updateUI();
+        console.log('UI update completed');
     }
     
     // AuctionApp 초기화
