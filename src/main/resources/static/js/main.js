@@ -5,7 +5,7 @@ class AuctionApp {
         this.init();
     }
     
-    init() {
+    async init() {
         this.setupEventListeners();
         this.renderAuctionGrid();
         this.startTimer();
@@ -172,8 +172,19 @@ class AuctionApp {
 }
 
 // Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // AuthManager 초기화
+    if (authManager) {
+        await authManager.init();
+    }
+    
+    // AuctionApp 초기화
     window.auctionApp = new AuctionApp();
+    
+    // authManager 초기화 후 상품들을 다시 렌더링
+    if (window.auctionApp) {
+        window.auctionApp.renderAuctionGrid();
+    }
 });
 
 // Global functions for onclick handlers

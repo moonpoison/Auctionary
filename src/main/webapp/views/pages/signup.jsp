@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 - Auctionary</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <a href="../index" class="logo">
+                <a href="/" class="logo">
                     <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 12l2 2 4-4"/>
                         <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
@@ -38,8 +38,18 @@
                     
                     <form class="auth-form" id="signupForm">
                         <div class="form-group">
+                            <label for="userId">아이디</label>
+                            <input type="text" id="userId" name="userId" required>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="name">이름</label>
                             <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="birthDate">생년월일</label>
+                            <input type="date" id="birthDate" name="birthDate" required>
                         </div>
                         
                         <div class="form-group">
@@ -66,16 +76,16 @@
                     </form>
                     
                     <div class="auth-footer">
-                        <p>이미 계정이 있으신가요? <a href="login">로그인</a></p>
+                        <p>이미 계정이 있으신가요? <a href="/auth/login">로그인</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="../js/mock-data.js"></script>
-    <script src="../js/utils.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/signup.js"></script>
+    <script src="/js/mock-data.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/signup.js"></script>
 </body>
 </html> 

@@ -12,10 +12,13 @@ import java.sql.Timestamp;
 @Data
 public class User {
     private String userId;
-    private String password;
     private String name;
-    private Timestamp birthDate;
+    private String password;
+    private String birthDate;
     private String phoneNumber;
     private String email;
     private String role;
+    private Integer points; // 포인트 필드 추가
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }
