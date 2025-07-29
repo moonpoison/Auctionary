@@ -14,4 +14,10 @@
         FROM product
     </select>
 
+    <select id="select" parameterType="int" resultType="edu.sm.dto.Product">
+        SELECT product_id, user_id, product_name, description, image_path, category_id, auction_start_date, auction_end_date, starting_price, bid_unit, transaction_status
+        FROM product
+        WHERE product_id = #{productId}
+    </select>
+
 </mapper>

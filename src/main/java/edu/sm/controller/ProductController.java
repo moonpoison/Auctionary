@@ -6,13 +6,14 @@ import edu.sm.dto.User;
 import edu.sm.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping; // GetMapping import 추가
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable; // PathVariable import 추가
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Enumeration;
-import java.util.List; // List import 추가
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -32,7 +33,7 @@ public class ProductController {
             String name = attributeNames.nextElement();
             System.out.println("Session Attribute: " + name + " = " + session.getAttribute(name));
         }
-        System.out.println("=====================================");
+        System.out.println("===================================== "); // 줄바꿈 추가
 
         User loggedInUser = (User) session.getAttribute("user");
         if (loggedInUser != null) {
@@ -46,5 +47,10 @@ public class ProductController {
     @GetMapping // 모든 상품 조회 엔드포인트 추가
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    @GetMapping("/{productId}") // 단일 상품 조회 엔드포인트 추가
+    public Product getProductById(@PathVariable int productId) {
+        return productService.getProductById(productId);
     }
 }
