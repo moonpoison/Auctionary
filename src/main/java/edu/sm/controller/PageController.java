@@ -20,9 +20,7 @@ public class PageController {
     }
 
     @GetMapping("/login")
-    public String login() {
-        return "pages/login";
-    }
+    public String login() { return "pages/login"; }
 
     @GetMapping("/signup")
     public String signup() {
@@ -49,11 +47,6 @@ public class PageController {
         }
         System.out.println("User found, proceeding to my-page");
         return "pages/my-page";
-    }
-
-    @GetMapping("/points")
-    public String points() {
-        return "pages/points";
     }
 
     @GetMapping("/sell")
