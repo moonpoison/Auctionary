@@ -22,26 +22,18 @@ async function handleLogin(e) {
     }
     
     try {
-        const response = await fetch('/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: userId,
-                password: password
-            })
+        const success = await authManager.login({
+            userId: userId,
+            password: password
         });
         
-        const result = await response.json();
-        
-        if (result.success) {
-            showMessage(result.message, 'success');
+        if (success) {
+            showMessage('로그인 성공! 메인 페이지로 이동합니다.', 'success');
             setTimeout(() => {
                 window.location.href = '/';
             }, 1000);
         } else {
-            showMessage(result.message, 'error');
+            showMessage('아이디 또는 비밀번호가 일치하지 않습니다.', 'error');
         }
     } catch (error) {
         showMessage('로그인 중 오류가 발생했습니다.', 'error');
@@ -52,20 +44,12 @@ async function handleLogin(e) {
 // Login with demo account
 async function loginWithDemo(userId) {
     try {
-        const response = await fetch('/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: userId,
-                password: 'demo'
-            })
+        const success = await authManager.login({
+            userId: userId,
+            password: 'demo'
         });
         
-        const result = await response.json();
-        
-        if (result.success) {
+        if (success) {
             showMessage('데모 계정으로 로그인 성공! 메인 페이지로 이동합니다.', 'success');
             setTimeout(() => {
                 window.location.href = '/';
