@@ -222,25 +222,59 @@ class AuctionDetailManager {
         // event.target.classList.add('active'); // 이 부분은 호출하는 곳에서 event 객체가 없을 수 있으므로 주석 처리 또는 수정 필요
     }
 
-    placeBid() {
+    async placeBid() {
         if (!authManager.isLoggedIn()) {
             alert('로그인이 필요합니다.');
             return;
         }
 
         const currentPrice = getCurrentPrice(this.currentItem);
-        const minBid = currentPrice + 10000; // 최소 입찰가
+        const minBid = currentPrice + this.currentItem.bidUnit; // 최소 입찰가 계산
 
-        const bidAmount = prompt(`최소 입찰가: ${formatPrice(minBid)}\n입찰 금액을 입력하세요:`, minBid);
+        const bidAmountStr = prompt(
+            `💰 현재가: ${formatPrice(currentPrice)}\n📈 최소 입찰가: ${formatPrice(minBid)}\n\n입찰 금액을 입력하세요:`,
+            minBid
+        );
 
-        if (bidAmount && !isNaN(bidAmount) && parseInt(bidAmount) >= minBid) {
-            alert('입찰이 완료되었습니다!');
-            // Here you would typically update the auction item with the new bid
-            this.renderAuctionDetail(); // Refresh the display
-        } else if (bidAmount !== null) {
+        if (bidAmountStr === null) return; // 취소 클릭 시 종료
+
+        const bidAmount = parseInt(bidAmountStr);
+        if (isNaN(bidAmount) || bidAmount < minBid) {
             alert('올바른 입찰가를 입력해주세요.');
+            return;
+        }
+
+        const bidData = {
+            productId: this.currentItem.productId,
+            bidPrice: bidAmount
+            // bidUserId와 bidDate는 서버에서 설정됨
+        };
+
+        try {
+            const response = await fetch('/api/bids', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bidData),
+                credentials: 'include' // ✅ 세션 쿠키 전송
+            });
+
+            if (response.ok) {
+                alert('입찰이 완료되었습니다!');
+                this.renderAuctionDetail(); // 최신 정보 반영
+            } else if (response.status === 401) {
+                alert('로그인이 필요합니다.');
+            } else {
+                const errorText = await response.text();
+                alert('입찰 실패: ' + errorText);
+            }
+        } catch (error) {
+            console.error('입찰 중 오류 발생:', error);
+            alert('입찰 처리 중 오류가 발생했습니다.');
         }
     }
+
 
     toggleWishlist() {
         if (!authManager.isLoggedIn()) {

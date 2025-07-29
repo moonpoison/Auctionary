@@ -358,24 +358,24 @@
         flex-direction: column;
         text-align: center;
     }
-
+    
     .profile-stats {
         justify-content: center;
     }
-
+    
     .overview-grid {
         grid-template-columns: 1fr;
     }
-
+    
     .tabs {
         gap: 4px;
     }
-
+    
     .tab-btn {
         padding: 6px 12px;
         font-size: 13px;
     }
-
+    
     .wishlist-grid {
         grid-template-columns: 1fr;
     }
@@ -385,18 +385,18 @@
     .profile-card {
         padding: 16px;
     }
-
+    
     .tab-pane {
         padding: 16px;
     }
-
+    
     .list-item {
         flex-direction: column;
         text-align: center;
     }
-
+    
     .list-item-image {
         width: 80px;
         height: 80px;
     }
-}
+} 

@@ -1,7 +1,9 @@
 package edu.sm.dto;
 
 import lombok.*;
-import java.util.Date;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,11 +13,10 @@ import java.util.Date;
 @Builder
 @Data
 public class Point_History {
-    private int historyId;
     private String userId;
     private String actionType;
     private int pointChange;
     private int finalPoint;
-    private Date changeDate;
+    private LocalDateTime changeDate;
     private String note;
 }

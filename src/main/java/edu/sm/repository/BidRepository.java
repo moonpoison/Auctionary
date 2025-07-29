@@ -1,13 +1,12 @@
 package edu.sm.repository;
 
-import edu.sm.dto.ActivityLog;
+import edu.sm.dto.Bid;
+import edu.sm.frame.SmRepository;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @Mapper
 public interface BidRepository {
-    List<ActivityLog> findRecentActivitiesByUserId(String userId);
+    int insert(Bid bid); // void → int 로 수정
 }
