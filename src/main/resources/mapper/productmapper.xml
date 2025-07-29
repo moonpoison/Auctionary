@@ -1,0 +1,12 @@
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.ProductRepository">
+
+    <insert id="insert" parameterType="edu.sm.dto.Product">
+        INSERT INTO product (user_id, product_name, description, image_path, category_id, auction_start_date, auction_end_date, starting_price, bid_unit, transaction_status)
+        VALUES (#{userId}, #{productName}, #{description}, #{imagePath}, #{categoryId}, #{auctionStartDate}, #{auctionEndDate}, #{startingPrice}, #{bidUnit}, #{transactionStatus})
+    </insert>
+
+</mapper>

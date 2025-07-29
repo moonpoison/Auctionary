@@ -116,15 +116,10 @@ class SellManager {
         const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
         
         const endDate = document.getElementById('endDate');
-        const endTime = document.getElementById('endTime');
         
         if (endDate) {
             const dateString = tomorrow.toISOString().slice(0, 16);
             endDate.value = dateString;
-        }
-        
-        if (endTime) {
-            endTime.value = '23:59';
         }
     }
     
@@ -256,54 +251,59 @@ class SellManager {
     handleFormSubmission(e) {
         const formData = new FormData(e.target);
         const data = this.getFormData(formData);
-        
+
         if (!this.validatePreviewData(data)) {
             return;
         }
-        
+
         if (this.uploadedImages.length === 0) {
             alert('최소 1개의 이미지를 업로드해주세요.');
             return;
         }
-        
-        // Create new auction item
+
         const newItem = this.createAuctionItem(data);
-        
-        // Add to mock data
-        MOCK_AUCTION_ITEMS.push(newItem);
-        
-        alert('상품이 성공적으로 등록되었습니다!');
-        window.location.href = '../index';
+
+        fetch('/api/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItem),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            alert('상품이 성공적으로 등록되었습니다!');
+            window.location.href = '../index';
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('상품 등록에 실패했습니다.');
+        });
     }
-    
+
     // Create auction item
     createAuctionItem(data) {
         const user = authManager.getUser();
-        const endDate = new Date(data.endDate);
-        const tags = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-        
+        console.log('data.endDate:', data.endDate); // Debugging line
+        const auctionEndDate = data.endDate ? new Date(data.endDate) : null;
+
         return {
-            id: `item-${Date.now()}`,
-            name: data.name,
+            userId: user.id,
+            productName: data.name,
             description: data.description,
-            images: this.uploadedImages.map(img => img.src),
-            tags: tags,
-            sellerId: user.id,
-            seller: {
-                name: user.name,
-                avatar: user.avatar,
-                rating: user.reviews.length > 0 ? 
-                    user.reviews.reduce((sum, review) => sum + review.rating, 0) / user.reviews.length : 0,
-                reviews: user.reviews.length
-            },
-            category: data.category,
-            endDate: endDate,
-            startPrice: parseInt(data.startPrice),
-            buyNowPrice: data.buyNowPrice ? parseInt(data.buyNowPrice) : undefined,
-            bidIncrement: parseInt(data.bidIncrement),
-            bids: [],
-            status: "active",
-            wishlistedCount: 0
+            imagePath: this.uploadedImages.length > 0 ? this.uploadedImages[0].name : null,
+            categoryId: parseInt(data.category),
+            auctionStartDate: new Date(),
+            auctionEndDate: auctionEndDate,
+            startingPrice: parseInt(data.startPrice),
+            bidUnit: parseInt(data.bidIncrement),
+            transactionStatus: 'AUCTIONING'
         };
     }
     

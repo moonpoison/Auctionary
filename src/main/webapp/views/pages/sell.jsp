@@ -96,12 +96,12 @@
                                 <label for="itemCategory">카테고리 *</label>
                                 <select id="itemCategory" name="category" required>
                                     <option value="">카테고리를 선택하세요</option>
-                                    <option value="디지털 기기">디지털 기기</option>
-                                    <option value="명품">명품</option>
-                                    <option value="한정판 굿즈">한정판 굿즈</option>
-                                    <option value="책">책</option>
-                                    <option value="취미용품">취미용품</option>
-                                    <option value="기타">기타</option>
+                                    <option value="1">디지털 기기</option>
+                                    <option value="2">명품</option>
+                                    <option value="3">한정판 굿즈</option>
+                                    <option value="4">책</option>
+                                    <option value="5">취미용품</option>
+                                    <option value="6">기타</option>
                                 </select>
                             </div>
                         </div>
@@ -157,10 +157,6 @@
                             <div class="form-group">
                                 <label for="endDate">경매 종료일 *</label>
                                 <input type="datetime-local" id="endDate" name="endDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="endTime">경매 종료시간 *</label>
-                                <input type="time" id="endTime" name="endTime" required>
                             </div>
                         </div>
                     </div>

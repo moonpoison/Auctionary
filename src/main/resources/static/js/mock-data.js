@@ -73,7 +73,7 @@ const MOCK_AUCTION_ITEMS = [
     name: "한정판 '사이버펑크 2077' 커스텀 그래픽카드",
     description:
       "최고 사양으로 커스텀된 한정판 그래픽카드입니다. RGB 조명이 화려하며, 원본 박스를 포함한 풀세트입니다.",
-    images: ["images/placeholder.svg"],
+    images: ["images/ex1.png"],
     tags: ["그래픽카드", "한정판", "PC부품"],
     sellerId: "user-2",
     seller: { name: "V-Tech", avatar: "images/placeholder.svg", rating: 4.5, reviews: 2 },
@@ -112,7 +112,7 @@ const MOCK_AUCTION_ITEMS = [
     id: "item-789",
     name: "친필 사인 '해리포터' 초판본 전집",
     description: "J.K. 롤링의 친필 사인이 포함된 초판본 전집입니다. 소장 가치가 매우 높습니다.",
-    images: ["images/placeholder.svg"],
+    images: ["images/ex2.png"],
     tags: ["해리포터", "초판본", "사인본"],
     sellerId: "user-me",
     seller: { name: "AuctionHero", avatar: "images/placeholder.svg", rating: 5.0, reviews: 1 },

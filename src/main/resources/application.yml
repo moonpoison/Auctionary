@@ -1,3 +1,5 @@
 spring:
   profiles:
     active: dev
+file:
+  upload-dir: src/main/resources/static/uploads/

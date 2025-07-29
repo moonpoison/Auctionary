@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/auth")
@@ -35,7 +34,7 @@ public class AuthController {
     // 회원가입 처리
     @PostMapping("/signup")
     @ResponseBody
-    public Map<String, Object> signup(@RequestBody User user, HttpSession session) {
+    public Map<String, Object> signup(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -58,19 +57,14 @@ public class AuthController {
             }
             
             user.setRole("USER");
-            user.setPoints(1000); // 기본 포인트 설정
             user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             
             // 회원가입 처리
             accountService.insert(user);
             
-            // 회원가입 성공 후 자동 로그인 처리
-            session.setAttribute("user", user);
-            
             response.put("success", true);
-            response.put("message", "회원가입이 완료되었습니다. 자동으로 로그인되었습니다.");
-            response.put("user", user);
+            response.put("message", "회원가입이 완료되었습니다.");
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "회원가입 중 오류가 발생했습니다: " + e.getMessage());
@@ -105,31 +99,12 @@ public class AuthController {
                 return response;
             }
             
-            // points가 null이면 기본값 설정
-            if (user.getPoints() == null) {
-                user.setPoints(1000);
-            }
-            
             // 세션에 사용자 정보 저장
             session.setAttribute("user", user);
             
-            // 세션 디버깅을 위한 로그
-            System.out.println("=== Login Success Debug ===");
-            System.out.println("Session ID: " + session.getId());
-            System.out.println("User saved to session: " + user.getUserId());
-            System.out.println("Session user attribute: " + session.getAttribute("user"));
-            System.out.println("Session creation time: " + session.getCreationTime());
-            System.out.println("Session last accessed time: " + session.getLastAccessedTime());
-            System.out.println("Session max inactive interval: " + session.getMaxInactiveInterval());
-            System.out.println("Session is new: " + session.isNew());
-            System.out.println("All session attributes: " + java.util.Collections.list(session.getAttributeNames()));
-            
-            // 응답에 더 자세한 정보 포함
             response.put("success", true);
             response.put("message", "로그인되었습니다.");
             response.put("user", user);
-            response.put("sessionId", session.getId());
-            response.put("sessionIsNew", session.isNew());
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "로그인 중 오류가 발생했습니다: " + e.getMessage());
@@ -155,26 +130,14 @@ public class AuthController {
     // 현재 로그인된 사용자 정보 조회
     @GetMapping("/current-user")
     @ResponseBody
-    public Map<String, Object> getCurrentUser(HttpServletRequest request) {
+    public Map<String, Object> getCurrentUser(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         
-        // 세션이 없으면 새로 생성
-        HttpSession session = request.getSession(true);
-        
-        System.out.println("=== getCurrentUser called ===");
-        System.out.println("Session ID: " + session.getId());
-        System.out.println("Session is new: " + session.isNew());
-        System.out.println("All session attributes: " + java.util.Collections.list(session.getAttributeNames()));
-        
         User user = (User) session.getAttribute("user");
-        System.out.println("User in session: " + user);
-        
         if (user != null) {
-            System.out.println("User found, returning user data");
             response.put("success", true);
             response.put("user", user);
         } else {
-            System.out.println("No user in session");
             response.put("success", false);
             response.put("message", "로그인되지 않았습니다.");
         }
