@@ -87,7 +87,8 @@
                     <div class="profile-header">
                         <img src="../images/placeholder.svg" alt="프로필" class="profile-avatar">
                         <div class="profile-info">
-                            <h2 id="userName">${userProfile.name}</h2>
+                            <h2 id="userName">${userProfile.name} (${userProfile.userId})</h2>
+
                             <p id="userEmail">${userProfile.email}</p>
                             <div class="profile-stats">
                                 <div class="stat">
