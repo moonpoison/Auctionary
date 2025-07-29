@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.ChatRepository">
+
+    <!-- 사용자가 참여한 모든 채팅방 조회 -->
+    <select id="findBySenderIdOrReceiverId" resultType="edu.sm.dto.Chat">
+        SELECT chat_id as chatId, sender_id as senderId, receiver_id as receiverId, product_id as productId
+        FROM Chat 
+        WHERE sender_id = #{userId} OR receiver_id = #{userId}
+        ORDER BY chat_id DESC
+    </select>
+
+    <!-- 특정 조건의 채팅방 조회 -->
+    <select id="findBySenderIdAndReceiverIdAndProductId" resultType="edu.sm.dto.Chat">
+        SELECT chat_id as chatId, sender_id as senderId, receiver_id as receiverId, product_id as productId
+        FROM Chat 
+        WHERE sender_id = #{senderId} AND receiver_id = #{receiverId} AND product_id = #{productId}
+        LIMIT 1
+    </select>
+
+    <!-- 특정 상품의 채팅방 조회 -->
+    <select id="findByProductId" resultType="edu.sm.dto.Chat">
+        SELECT chat_id as chatId, sender_id as senderId, receiver_id as receiverId, product_id as productId
+        FROM Chat 
+        WHERE product_id = #{productId}
+    </select>
+
+    <!-- 채팅방 ID로 조회 -->
+    <select id="findById" resultType="edu.sm.dto.Chat">
+        SELECT chat_id as chatId, sender_id as senderId, receiver_id as receiverId, product_id as productId
+        FROM Chat 
+        WHERE chat_id = #{chatId}
+    </select>
+
+    <!-- 채팅방 저장 -->
+    <insert id="save" parameterType="edu.sm.dto.Chat" useGeneratedKeys="true" keyProperty="chatId">
+        INSERT INTO Chat (sender_id, receiver_id, product_id)
+        VALUES (#{senderId}, #{receiverId}, #{productId})
+    </insert>
+
+</mapper> 

@@ -73,9 +73,23 @@
         </div>
     </main>
 
+    <!-- Chat Modal -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-modal-content">
+            <div class="chat-modal-header">
+                <h3>채팅</h3>
+                <button class="close-btn" id="closeChatBtn">&times;</button>
+            </div>
+            <div class="chat-list" id="chatList">
+                <!-- Chat conversations will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script src="../js/mock-data.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/chat.js"></script>
     <script src="../js/auction-detail.js"></script>
 </body>
 </html> 
