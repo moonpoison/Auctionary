@@ -2,11 +2,92 @@
 class AuthManager {
     constructor() {
         this.currentUser = null;
-        this.loadUser();
-        this.updateUI();
+        this.initialized = false;
+        // 비동기 초기화는 별도로 호출
     }
     
-    // Load user from localStorage
+    async init() {
+        console.log('=== authManager.init() called ===');
+        console.log('Current initialized state:', this.initialized);
+        
+        if (this.initialized) {
+            console.log('Already initialized, returning');
+            return;
+        }
+        
+        console.log('Starting initialization...');
+        console.log('Calling checkServerSession...');
+        
+        await this.checkServerSession();
+        
+        console.log('checkServerSession completed');
+        console.log('Current user after session check:', this.currentUser);
+        
+        console.log('Calling updateUI...');
+        this.updateUI();
+        
+        this.initialized = true;
+        console.log('Initialization completed. initialized =', this.initialized);
+    }
+    
+    // Check server session status
+    async checkServerSession() {
+        try {
+            console.log('=== checkServerSession called ===');
+            
+            const response = await fetch('/auth/current-user', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include' // 쿠키 포함
+            });
+            
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            
+            const result = await response.json();
+            console.log('Server session check result:', result);
+            
+            if (result.success && result.user) {
+                console.log('User found in server session, updating currentUser');
+                this.currentUser = result.user;
+                console.log('Current user after server update:', this.currentUser);
+            } else {
+                // 서버에서 사용자 정보를 가져오지 못했을 때 현재 사용자 정보 유지
+                console.log('No user in server session, but keeping current user if exists');
+                console.log('Current user before check:', this.currentUser);
+                
+                // 현재 사용자가 있으면 유지, 없으면 localStorage에서 복원 시도
+                if (!this.currentUser) {
+                    console.log('No current user, trying to restore from localStorage');
+                    const savedUser = Storage.get('currentUser');
+                    if (savedUser) {
+                        this.currentUser = savedUser;
+                        console.log('Restored user from localStorage:', this.currentUser);
+                    } else {
+                        console.log('No user found in localStorage either');
+                    }
+                } else {
+                    console.log('Keeping existing current user:', this.currentUser);
+                }
+            }
+        } catch (error) {
+            console.error('Session check error:', error);
+            // 서버 체크 실패 시 로컬 스토리지에서 복원 시도
+            console.log('Server check failed, trying to restore from localStorage');
+            const savedUser = Storage.get('currentUser');
+            if (savedUser) {
+                this.currentUser = savedUser;
+                console.log('Restored user from localStorage after error:', this.currentUser);
+            } else {
+                this.currentUser = null;
+                console.log('No user found in localStorage after error');
+            }
+        }
+    }
+    
+    // Load user from localStorage (fallback)
     loadUser() {
         const savedUser = Storage.get('currentUser');
         if (savedUser) {
@@ -16,23 +97,82 @@ class AuthManager {
     
     // Save user to localStorage
     saveUser(user) {
-        this.currentUser = user;
-        Storage.set('currentUser', user);
+        console.log('=== saveUser called ===');
+        console.log('Previous currentUser:', this.currentUser);
+        console.log('New user data:', user);
+        
+        // 사용자 정보를 확실하게 저장
+        this.currentUser = {
+            userId: user.userId,
+            name: user.name,
+            email: user.email,
+            points: user.points || 0,
+            role: user.role
+        };
+        
+        console.log('Current user after save:', this.currentUser);
+        console.log('User ID:', this.currentUser ? this.currentUser.userId : 'null');
+        console.log('User points:', this.currentUser ? this.currentUser.points : 'null');
+        
+        // 로컬 스토리지에도 저장 (백업용)
+        Storage.set('currentUser', this.currentUser);
+        console.log('User saved to client and localStorage:', this.currentUser);
     }
     
     // Login user
-    login(userData) {
-        const user = MOCK_USERS.find(u => u.email === userData.email);
-        if (user) {
-            this.saveUser(user);
-            this.updateUI();
-            return true;
+    async login(userData) {
+        console.log('=== login called ===');
+        console.log('Login data:', userData);
+        
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // 쿠키 포함
+                body: JSON.stringify(userData)
+            });
+            
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            
+            const result = await response.json();
+            console.log('Login response:', result);
+            
+            if (result.success && result.user) {
+                console.log('Login successful, saving user...');
+                console.log('User data from server:', result.user);
+                this.saveUser(result.user);
+                console.log('User saved, updating UI...');
+                this.updateUI();
+                console.log('UI updated, login complete');
+                return true;
+            } else {
+                console.log('Login failed:', result.message);
+                console.log('Result object:', result);
+            }
+            return false;
+        } catch (error) {
+            console.error('Login error:', error);
+            return false;
         }
-        return false;
     }
     
     // Logout user
-    logout() {
+    async logout() {
+        try {
+            await fetch('/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include' // 쿠키 포함
+            });
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+        
         this.currentUser = null;
         Storage.remove('currentUser');
         this.updateUI();
@@ -45,21 +185,37 @@ class AuthManager {
     
     // Check if user is logged in
     isLoggedIn() {
-        return this.currentUser !== null;
+        const loggedIn = this.currentUser !== null;
+        console.log('=== isLoggedIn called ===');
+        console.log('Current user:', this.currentUser);
+        console.log('Is logged in:', loggedIn);
+        return loggedIn;
     }
     
     // Update UI based on authentication state
     updateUI() {
+        console.log('=== updateUI called ===');
+        console.log('Current user:', this.currentUser);
+        console.log('User logged in:', this.isLoggedIn());
+        
+        // auth-buttons 요소 찾기
         const authButtons = document.querySelector('.auth-buttons');
         if (!authButtons) {
             console.warn("auth-buttons element not found. Skipping update.");
-            return; // login.jsp에서는 그냥 UI 업데이트 안 함
+            return;
         }
+        
+        // points 버튼 찾기
         const pointsBtn = document.getElementById('pointsBtn');
         const chatBtn = document.getElementById('chatBtn');
         
+        console.log('Found elements - authButtons:', authButtons, 'pointsBtn:', pointsBtn, 'chatBtn:', chatBtn);
+        
         if (this.isLoggedIn()) {
-            // Hide login/signup buttons
+            console.log('User is logged in, updating UI...');
+            console.log('User details:', this.currentUser);
+            
+            // auth-buttons 내용을 안전하게 교체
             authButtons.innerHTML = `
                 <button class="btn btn-ghost" onclick="authManager.logout()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,26 +227,38 @@ class AuthManager {
                 </button>
             `;
             
-            // Show points
+            // 포인트 표시 업데이트
             if (pointsBtn) {
                 const pointsText = pointsBtn.querySelector('.points-text');
-                if (pointsText) {
+                console.log('Points text element:', pointsText);
+                console.log('User points:', this.currentUser.points);
+                
+                if (pointsText && this.currentUser && this.currentUser.points) {
                     pointsText.textContent = this.currentUser.points.toLocaleString() + ' P';
+                    console.log('Points updated to:', this.currentUser.points.toLocaleString() + ' P');
+                } else if (pointsText) {
+                    pointsText.textContent = '0 P';
+                    console.log('Points set to 0 P');
                 }
             }
             
-            // Show chat button
+            // 채팅 버튼 표시
             if (chatBtn) {
                 chatBtn.style.display = 'flex';
+                console.log('Chat button shown');
             }
+            
+            console.log('UI updated for logged in user');
         } else {
-            // Show login/signup buttons
+            console.log('User is not logged in, updating UI...');
+            
+            // auth-buttons 내용을 안전하게 교체
             authButtons.innerHTML = `
                 <a href="/login" class="btn btn-ghost">로그인</a>
                 <a href="/signup" class="btn btn-primary">회원가입</a>
             `;
             
-            // Hide points
+            // 포인트 숨기기
             if (pointsBtn) {
                 const pointsText = pointsBtn.querySelector('.points-text');
                 if (pointsText) {
@@ -98,10 +266,12 @@ class AuthManager {
                 }
             }
             
-            // Hide chat button
+            // 채팅 버튼 숨기기
             if (chatBtn) {
                 chatBtn.style.display = 'none';
             }
+            
+            console.log('UI updated for logged out user');
         }
     }
     
@@ -130,4 +300,18 @@ class AuthManager {
 }
 
 // Initialize auth manager
-const authManager = new AuthManager(); 
+const authManager = new AuthManager();
+
+// 페이지 로드 시 즉시 사용자 정보 복원
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== DOMContentLoaded - authManager initialization ===');
+    const savedUser = Storage.get('currentUser');
+    if (savedUser) {
+        console.log('Restoring user from localStorage on page load:', savedUser);
+        authManager.currentUser = savedUser;
+        authManager.initialized = true;
+        console.log('User restored, initialized =', authManager.initialized);
+    } else {
+        console.log('No saved user found in localStorage');
+    }
+}); 

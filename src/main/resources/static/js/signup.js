@@ -55,9 +55,15 @@ async function handleSignup(e) {
         const result = await response.json();
         
         if (result.success) {
+            // 회원가입 성공 후 자동 로그인 처리
+            if (result.user && window.authManager) {
+                window.authManager.saveUser(result.user);
+                window.authManager.updateUI();
+            }
+            
             showMessage(result.message, 'success');
             setTimeout(() => {
-                window.location.href = '/auth/login';
+                window.location.href = '/';
             }, 1000);
         } else {
             showMessage(result.message, 'error');
