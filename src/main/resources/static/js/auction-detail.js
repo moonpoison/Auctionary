@@ -1,3 +1,21 @@
+const CATEGORY_LIST = [
+    { id: 1, name: "전자제품", parentId: null },
+    { id: 2, name: "패션의류", parentId: null },
+    { id: 3, name: "도서/음반", parentId: null },
+    { id: 4, name: "가구/인테리어", parentId: null },
+    { id: 5, name: "노트북/PC", parentId: 1 },
+    { id: 6, name: "휴대폰", parentId: 1 },
+    { id: 7, name: "남성 의류", parentId: 2 },
+    { id: 8, name: "여성 의류", parentId: 2 },
+    { id: 9, name: "소설", parentId: 3 },
+    { id: 10, name: "침대/소파", parentId: 4 }
+];
+
+function getCategoryNameById(categoryId) {
+    const category = CATEGORY_LIST.find(cat => cat.id === categoryId);
+    return category ? category.name : '기타';
+}
+
 class AuctionDetailManager {
     constructor() {
         this.currentItem = null;
@@ -65,7 +83,7 @@ class AuctionDetailManager {
                     <div class="auction-detail-header">
                         <div class="auction-detail-tags">
                             <!-- 카테고리 정보가 있다면 여기에 표시 -->
-                            ${this.currentItem.categoryId ? `<span class="tag">카테고리 ${this.currentItem.categoryId}</span>` : ''}
+                            ${this.currentItem.categoryId ? `<span class="tag">${getCategoryNameById(this.currentItem.categoryId)}</span>` : ''}
                         </div>
                         <h1 class="auction-detail-title">${this.currentItem.productName}</h1>
                         <div class="auction-detail-seller">
@@ -267,7 +285,11 @@ class AuctionDetailManager {
                 alert('로그인이 필요합니다.');
             } else {
                 const errorText = await response.text();
-                alert('입찰 실패: ' + errorText);
+                if (errorText.includes("포인트가 부족합니다")) {
+                    alert('포인트가 부족합니다. 포인트를 충전해주세요.');
+                } else {
+                    alert('입찰 실패: ' + errorText);
+                }
             }
         } catch (error) {
             console.error('입찰 중 오류 발생:', error);

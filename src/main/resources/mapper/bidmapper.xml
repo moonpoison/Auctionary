@@ -11,4 +11,16 @@
 
     <!-- 필요한 경우 select, selectAll 등 추가 -->
 
+    <select id="getHighestBid" parameterType="int" resultType="edu.sm.dto.Bid">
+        SELECT
+            bid_user_id as bidUserId,
+            product_id as productId,
+            bid_price as bidPrice,
+            bid_date as bidDate
+        FROM bid
+        WHERE product_id = #{productId}
+        ORDER BY bid_price DESC
+        LIMIT 1
+    </select>
+
 </mapper>

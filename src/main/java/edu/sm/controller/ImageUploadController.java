@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/upload")
-@CrossOrigin(origins = "*") // 이 부분 추가
+@CrossOrigin(origins = "http://localhost:8081", allowCredentials = "true")
 public class ImageUploadController {
 
     @Value("${file.upload-dir}")

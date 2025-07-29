@@ -92,16 +92,21 @@
                                 <label for="itemName">상품명 *</label>
                                 <input type="text" id="itemName" name="name" required placeholder="상품명을 입력하세요">
                             </div>
+                            <!-- 대분류 -->
                             <div class="form-group">
-                                <label for="itemCategory">카테고리 *</label>
-                                <select id="itemCategory" name="category" required>
-                                    <option value="">카테고리를 선택하세요</option>
-                                    <option value="1">디지털 기기</option>
-                                    <option value="2">명품</option>
-                                    <option value="3">한정판 굿즈</option>
-                                    <option value="4">책</option>
-                                    <option value="5">취미용품</option>
-                                    <option value="6">기타</option>
+                                <label for="mainCategory">대분류 *</label>
+                                <select id="mainCategory" name="mainCategory" required>
+                                    <option value="">대분류를 선택하세요</option>
+                                    <!-- JavaScript로 동적 삽입 -->
+                                </select>
+                            </div>
+
+                            <!-- 중분류 -->
+                            <div class="form-group">
+                                <label for="subCategory">중분류 *</label>
+                                <select id="subCategory" name="category" required>
+                                    <option value="">중분류를 선택하세요</option>
+                                    <!-- JavaScript로 동적 삽입 -->
                                 </select>
                             </div>
                         </div>
