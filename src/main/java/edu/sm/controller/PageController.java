@@ -20,9 +20,7 @@ public class PageController {
     }
 
     @GetMapping("/login")
-    public String login() {
-        return "pages/login";
-    }
+    public String login() { return "pages/login"; }
 
     @GetMapping("/signup")
     public String signup() {
@@ -49,25 +47,6 @@ public class PageController {
         }
         System.out.println("User found, proceeding to my-page");
         return "pages/my-page";
-    }
-
-    @GetMapping("/points")
-    public String points(HttpServletRequest request) {
-        // 세션이 없으면 새로 생성
-        HttpSession session = request.getSession(true);
-        System.out.println("=== Points Session Check ===");
-        System.out.println("Session: " + session.getId());
-        System.out.println("Session is new: " + session.isNew());
-        
-        User user = (User) session.getAttribute("user");
-        System.out.println("User in session: " + user);
-        
-        if (user == null) {
-            System.out.println("User not found in session, redirecting to login");
-            return "redirect:/login";
-        }
-        System.out.println("User found, proceeding to points");
-        return "pages/points";
     }
 
     @GetMapping("/sell")
