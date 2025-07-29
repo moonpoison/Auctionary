@@ -51,6 +51,11 @@ public class PageController {
         return "pages/my-page";
     }
 
+    @GetMapping("/points")
+    public String points() {
+        return "pages/points";
+    }
+
     @GetMapping("/sell")
     public String sell(HttpServletRequest request) {
         // 세션이 없으면 새로 생성

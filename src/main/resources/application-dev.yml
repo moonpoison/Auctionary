@@ -20,9 +20,9 @@ spring:
       suffix: .jsp
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.64/auctionary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: tester
-    password: 1234
+    url: jdbc:mysql://my8002.gabiadb.com/doyeondb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: doyeondb
+    password: bang0622@@
 
 mybatis:
   type-aliases-package: edu.sm.dto
