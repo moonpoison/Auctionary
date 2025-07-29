@@ -1,5 +1,6 @@
 package edu.sm.auctionary;
 
+import edu.sm.service.PointHistoryService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class DataBaseTest {
     @PostConstruct
     public void testConnection() {
         try {
-            String result = jdbcTemplate.queryForObject("SELECT NOW()", String.class);
+            String result = jdbcTemplate.queryForObject("select count(*) from bid", String.class);
             System.out.println("✅ DB 연결 성공: 현재 시간 = " + result);
         } catch (Exception e) {
             System.err.println("❌ DB 연결 실패: " + e.getMessage());

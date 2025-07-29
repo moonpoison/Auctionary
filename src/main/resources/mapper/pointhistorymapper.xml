@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.PointHistoryRepository">
+
+    <select id="select" parameterType="String" resultType="Point_History">
+        select final_point from point_history where user_id=#{userId} order by change_date desc limit 1;
+    </select>
+
+    <select id="selectAll" resultType="Point_History">
+        select * from point_history where user_id=#{userId}
+    </select>
+
+    <insert id="insert" parameterType="Point_History">
+        INSERT INTO Point_History (history_id, user_id, action_type, point_change, final_point, change_date, note)
+        VALUES (0, #{user_id}, #{action_type}, #{point_change}, #{final_point}, NOW(), #{note})
+    </insert>
+
+    <update id="update" parameterType="Point_History">
+        UPDATE Point_History SET
+                                 user_id=#{user_id},
+                                 action_type=#{action_type},
+                                 point_change=#{point_change},
+                                 final_point=#{final_point},
+                                 change_date=NOW(),
+                                 note=#{note}
+        WHERE history_id=#{historyId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM Point_History WHERE history_id=#{historyId}
+    </delete>
+
+</mapper>

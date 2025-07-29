@@ -16,9 +16,7 @@ public class PageController {
     }
 
     @GetMapping("/login")
-    public String login() {
-        return "pages/login";
-    }
+    public String login() { return "pages/login"; }
 
     @GetMapping("/signup")
     public String signup() {
@@ -28,11 +26,6 @@ public class PageController {
     @GetMapping("/my-page")
     public String myPage() {
         return "pages/my-page";
-    }
-
-    @GetMapping("/points")
-    public String points() {
-        return "pages/points";
     }
 
     @GetMapping("/sell")

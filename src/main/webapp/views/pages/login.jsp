@@ -35,25 +35,25 @@
                         <h1>로그인</h1>
                         <p>계정에 로그인하여 경매에 참여하세요</p>
                     </div>
-                    
+
                     <form class="auth-form" id="loginForm">
                         <div class="form-group">
                             <label for="userId">아이디</label>
                             <input type="text" id="userId" name="userId" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="password">비밀번호</label>
                             <input type="password" id="password" name="password" required>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary auth-submit">로그인</button>
                     </form>
-                    
+
                     <div class="auth-footer">
                         <p>계정이 없으신가요? <a href="/auth/signup">회원가입</a></p>
                     </div>
-                    
+
                     <div class="demo-accounts">
                         <h3>데모 계정</h3>
                         <div class="demo-account-list">
