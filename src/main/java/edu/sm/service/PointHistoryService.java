@@ -15,8 +15,8 @@ public class PointHistoryService {
 
     final PointHistoryRepository pointHistoryRepository;
 
-    public void insert(User user) throws Exception {
-        pointHistoryRepository.insert(user);
+    public void insert(Point_History pointHistory) throws Exception {
+        pointHistoryRepository.insert(pointHistory);
     }
 
     public void update(User user) throws Exception {
