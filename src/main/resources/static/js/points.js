@@ -85,70 +85,41 @@ class PointsManager {
     // Load points history
     loadPointsHistory() {
         const historyList = document.getElementById('pointsHistoryList');
-        if (!this.originalHistory) {
-            const serverHistory = document.getElementById('serverPointHistory');
-            if (!serverHistory) return;
-            this.originalHistory = JSON.parse(serverHistory.value);
-        }
-
         if (!historyList) return;
 
-        const user = authManager.getUser();
-        if (!user) return;
-
-        // Parse point history
-        const history = this.originalHistory.map(item => ({
-            type: item.actionType.toLowerCase(),
-            amount: item.pointChange,
-            description: item.note,
-            date: new Date(item.changeDate)
-        }));
-
-        // Filter history based on current filter
-        let filteredHistory = history;
-
-        if (this.currentFilter !== 'all') {
-            filteredHistory = history.filter(item => {
-                switch (this.currentFilter) {
-                    case 'charge':
-                        return item.type === 'charge';
-                    case 'withdraw':
-                        return item.type === 'withdraw';
-                    case 'bid':
-                        return item.type === 'bid_place';
-                    case 'purchase':
-                        return item.type === 'purchase';
-                    case 'sale':
-                        return item.type === 'sale';
-                    default:
-                        return true;
+        fetch('/points/history')
+            .then(response => response.json())
+            .then(historyData => {
+                if (!historyData || historyData.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">내역이 없습니다.</p>';
+                    return;
                 }
-            });
-        }
 
-        if (filteredHistory.length === 0) {
-            historyList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">내역이 없습니다.</p>';
-            return;
-        }
+                const filteredHistory = historyData
+                    .filter(item => this.currentFilter === 'all' || item.actionType.toLowerCase() === this.currentFilter)
+                    .map(item => ({
+                        type: item.actionType.toLowerCase(),
+                        amount: item.pointChange,
+                        description: item.note,
+                        date: new Date(item.changeDate)
+                    }));
 
-        historyList.innerHTML = filteredHistory.map(item => {
-            const typeClass = this.getTypeClass(item.type);
-            const typeLabel = this.getTypeLabel(item.type);
-
-            return `
-            <div class="points-history-item">
-                <div class="points-history-info">
-                    <div class="points-history-description">${item.description}</div>
-                    <div class="points-history-date">${this.formatTime(item.date)}</div>
+                historyList.innerHTML = filteredHistory.map(item => `
+                <div class="points-history-item">
+                    <div class="points-history-info">
+                        <div class="points-history-description">${item.description}</div>
+                        <div class="points-history-date">${this.formatTime(item.date)}</div>
+                    </div>
+                    <div class="points-history-amount ${item.amount > 0 ? 'positive' : 'negative'}">
+                        ${item.amount > 0 ? '+' : ''}${formatPrice(item.amount)}
+                        <span class="points-history-type ${this.getTypeClass(item.type)}">${this.getTypeLabel(item.type)}</span>
+                    </div>
                 </div>
-                <div class="points-history-amount ${item.amount > 0 ? 'positive' : 'negative'}">
-                    ${item.amount > 0 ? '+' : ''}${formatPrice(item.amount)}
-                    <span class="points-history-type ${typeClass}">${typeLabel}</span>
-                </div>
-            </div>
-        `;
-        }).join('');
+            `).join('');
+            })
+            .catch(error => console.error('Error fetching history:', error));
     }
+
 
     getTypeClass(type) {
         switch (type) {
@@ -221,71 +192,104 @@ class PointsManager {
     
     // Handle charge form submission
     handleCharge(e) {
+        e.preventDefault(); // 폼 기본 동작 막기
+
         const formData = new FormData(e.target);
         const amount = parseInt(formData.get('amount'));
         const method = formData.get('method');
-        
+
         if (!amount || amount < 10000) {
             alert('최소 10,000원부터 충전 가능합니다.');
             return;
         }
-        
+
         if (!method) {
             alert('결제 방법을 선택해주세요.');
             return;
         }
-        
-        // Simulate charge
-        const user = authManager.getUser();
-        user.points += amount;
-        authManager.saveUser(user);
-        
-        // Add to history
-        const historyItem = {
-            type: 'charge',
-            amount: amount,
-            description: `${this.getMethodLabel(method)} 충전`,
-            date: new Date()
-        };
-        
-        this.closeChargeModal();
-        this.loadUserPoints();
-        this.loadPointsHistory();
-        
-        alert(`${formatPrice(amount)}이 충전되었습니다.`);
+
+        // 서버로 AJAX 요청
+        fetch('/InsertCharge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({amount: amount, method: this.getMethodLabel(method)})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`${formatPrice(amount)}이 충전되었습니다.`);
+
+                    this.closeChargeModal();
+                    this.loadPointsHistory();
+
+                    const currentPointsElement = document.getElementById('currentPoints');
+                    const pointsTextElement = document.querySelector('.points-text');
+                    if (currentPointsElement) {
+                        currentPointsElement.textContent = data.finalPointAfterCharge.toLocaleString() + ' P';
+                    }
+                    if (pointsTextElement) {
+                        pointsTextElement.textContent = data.finalPointAfterCharge.toLocaleString() + ' P';
+                    }
+                } else {
+                    alert('충전 요청 처리 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
     
     // Handle withdraw form submission
     handleWithdraw(e) {
+        e.preventDefault();
+
         const formData = new FormData(e.target);
         const amount = parseInt(formData.get('amount'));
         const account = formData.get('account');
-        
+
         if (!amount || amount < 10000) {
             alert('최소 10,000원부터 출금 가능합니다.');
             return;
         }
-        
+
         if (!account) {
             alert('출금 계좌를 입력해주세요.');
             return;
         }
-        
-        const user = authManager.getUser();
-        if (user.points < amount) {
-            alert('포인트가 부족합니다.');
-            return;
-        }
-        
-        // Simulate withdraw
-        user.points -= amount;
-        authManager.saveUser(user);
-        
-        this.closeWithdrawModal();
-        this.loadUserPoints();
-        this.loadPointsHistory();
-        
-        alert(`${formatPrice(amount)}이 출금 신청되었습니다.`);
+
+        fetch('/InsertWithdraw', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ amount: amount, account: account })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`${formatPrice(amount)}이 출금 신청되었습니다.`);
+
+                    // ✅ 모달 닫기
+                    this.closeWithdrawModal();
+
+                    // ✅ 최신 포인트 UI 반영
+                    const currentPointsElement = document.getElementById('currentPoints');
+                    const pointsTextElement = document.querySelector('.points-text');
+
+                    if (currentPointsElement) {
+                        currentPointsElement.textContent = data.finalPointAfterWithdraw.toLocaleString() + ' P';
+                    }
+                    if (pointsTextElement) {
+                        pointsTextElement.textContent = data.finalPointAfterWithdraw.toLocaleString() + ' P';
+                    }
+
+                    // ✅ 내역 갱신
+                    this.loadPointsHistory();
+                } else {
+                    alert(data.message || '출금 요청 처리 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
     
     // Get method label

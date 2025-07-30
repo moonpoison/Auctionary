@@ -77,4 +77,17 @@ public class PointHistoryController {
         return "pages/points";
     }
 
+    @GetMapping("/history")
+    @ResponseBody
+    public List<Point_History> getPointHistory(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        List<Point_History> list = null;
+        try{
+            list = pointHistoryService.selectAll(user.getUserId());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

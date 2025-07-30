@@ -18,5 +18,5 @@ public class Chat_History {
     private String senderId;
     private String content;
     private LocalDateTime sendDate;
-    private boolean read = false;
+    private boolean read;
 }

@@ -1,15 +1,21 @@
 package edu.sm.repository;
 
 import edu.sm.dto.Point_History;
+import edu.sm.dto.User;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 @Mapper
 public interface PointHistoryRepository {
-    void insert(Point_History pointHistory);
-    Point_History select(String userId);
-    List<Point_History> selectAll(String userId);
+    
+    void insert(Point_History pointHistory) throws Exception;
+    
+    void update(User user) throws Exception;
+    
+    void delete(String userId) throws Exception;
+    
+    List<Point_History> selectAll(String userId) throws Exception;
+    
+    Integer select(String userId) throws Exception;
 }
