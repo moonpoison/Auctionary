@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.ReviewRepository">
+
+    <!-- ★ 여기: 중첩 클래스는 $ 로 구분 ★ -->
+    <resultMap id="ReviewVOMap" type="edu.sm.repository.ReviewRepository$ReviewVO">
+        <id     property="reviewId"     column="review_id"/>
+        <result property="reviewerId"   column="reviewer_id"/>
+        <result property="reviewerName" column="reviewer_name"/>
+        <result property="productName"  column="product_name"/>
+        <result property="rating"       column="rating"/>
+        <result property="content"      column="content"/>
+        <result property="reviewDate"   column="review_date"/>
+    </resultMap>
+
+    <!-- 판매자가 받은 리뷰(구매자가 작성) -->
+    <select id="findReceived" parameterType="string" resultMap="ReviewVOMap">
+        SELECT
+            r.review_id,
+            r.reviewer_id,
+            u.name          AS reviewer_name,
+            p.product_name,
+            r.rating,
+            r.content,
+            r.review_date
+        FROM Review        r
+                 JOIN Trade_History t ON t.trade_id   = r.trade_id
+                 JOIN Product       p ON p.product_id = t.product_id
+                 JOIN User          u ON u.user_id    = r.reviewer_id
+        WHERE t.seller_id  = #{userId}
+          AND r.reviewer_id = t.buyer_id
+        ORDER BY r.review_date DESC
+    </select>
+
+</mapper>

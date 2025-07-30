@@ -8,14 +8,14 @@ import java.util.List;
 
 @Mapper
 public interface PointHistoryRepository {
-    
+
     void insert(Point_History pointHistory) throws Exception;
-    
+
     void update(User user) throws Exception;
-    
+
     void delete(String userId) throws Exception;
-    
+
     List<Point_History> selectAll(String userId) throws Exception;
-    
+
     Integer select(String userId) throws Exception;
 }
