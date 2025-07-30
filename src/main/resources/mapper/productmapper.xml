@@ -19,5 +19,4 @@
         FROM product
         WHERE product_id = #{productId}
     </select>
-
 </mapper>
