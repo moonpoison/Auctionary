@@ -105,6 +105,7 @@ class AuctionApp {
                 images: [p.imagePath],
                 seller: { name: '등록자' }, // 백엔드 연동 시 사용자명으로 대체 가능
                 startingPrice: p.startingPrice,
+                highestBid: p.highestBid,
                 endDate: p.auctionEndDate,
                 wishlistedCount: 0,
                 status: 'active'
