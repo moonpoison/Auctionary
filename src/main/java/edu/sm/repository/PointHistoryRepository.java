@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface PointHistoryRepository {
     
-    void insert(User user) throws Exception;
+    void insert(Point_History pointHistory) throws Exception;
     
     void update(User user) throws Exception;
     

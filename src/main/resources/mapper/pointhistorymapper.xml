@@ -9,12 +9,12 @@
     </select>
 
     <select id="selectAll" parameterType="String" resultType="Point_History">
-        select * from point_history where user_id=#{userId};
+        select * from point_history where user_id=#{userId} order by change_date desc;
     </select>
 
-    <insert id="insert" parameterType="User">
+    <insert id="insert" parameterType="Point_History">
         INSERT INTO Point_History (history_id, user_id, action_type, point_change, final_point, change_date, note)
-        VALUES (0, #{user_id}, #{action_type}, #{point_change}, #{final_point}, NOW(), #{note})
+        VALUES (0, #{userId}, #{actionType}, #{pointChange}, #{finalPoint}, NOW(), #{note})
     </insert>
 
     <update id="update" parameterType="User">
