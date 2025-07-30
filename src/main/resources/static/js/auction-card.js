@@ -16,7 +16,7 @@ class AuctionCard {
         card.innerHTML = `
             <a href="auction-detail?id=${this.item.id}" class="auction-card-link">
                 <div class="auction-card-image">
-                    <img src="/uploads/${this.item.images[0] || 'placeholder.svg'}" alt="${this.item.name}" loading="lazy">
+                    <img src="/uploads/${this.item.imagePath || 'placeholder.svg'}" alt="${this.item.name}" loading="lazy">
                     <div class="auction-card-badge ${timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1) ? 'urgent' : ''}">
                         ${timeLeft.text}
                     </div>
@@ -29,7 +29,7 @@ class AuctionCard {
                 </div>
                 <div class="auction-card-content">
                     <div class="auction-card-tags">
-                        ${this.item.tags.slice(0, 2).map(tag => `<span class="auction-card-tag">${tag}</span>`).join('')}
+                        <span class="auction-card-tag">${this.item.tags[0]}</span>
                     </div>
                     <h3 class="auction-card-title">${this.item.name}</h3>
                     <div class="auction-card-seller">
@@ -103,21 +103,14 @@ class AuctionCardManager {
             button.classList.add('active');
         }
         
-        // Update wishlist count
-        const card = this.cards.get(itemId);
-        if (card) {
-            const wishlistCount = card.querySelector('.auction-card-wishlist-count span');
-            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
-            if (wishlistCount && item) {
-                wishlistCount.textContent = item.wishlistedCount;
-            }
-        }
+        // 위시리스트 카운트 업데이트 로직은 백엔드 연동 후 구현
+        // 현재는 MOCK_AUCTION_ITEMS를 사용하지 않으므로 제거
     }
     
     // Update countdown timers
-    updateTimers() {
+    updateTimers(items) {
         this.cards.forEach((card, itemId) => {
-            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
+            const item = items.find(i => i.id === itemId);
             if (item && item.status === 'active') {
                 const badge = card.querySelector('.auction-card-badge');
                 if (badge) {

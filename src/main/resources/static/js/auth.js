@@ -198,6 +198,10 @@ class AuthManager {
         console.log('Current user:', this.currentUser);
         console.log('User logged in:', this.isLoggedIn());
         
+        // localStorage에서 사용자 정보 확인
+        const savedUser = Storage.get('currentUser');
+        console.log('Saved user from localStorage:', savedUser);
+        
         // auth-buttons 요소 찾기
         const authButtons = document.querySelector('.auth-buttons');
         if (!authButtons) {
@@ -211,9 +215,20 @@ class AuthManager {
         
         console.log('Found elements - authButtons:', authButtons, 'pointsBtn:', pointsBtn, 'chatBtn:', chatBtn);
         
-        if (this.isLoggedIn()) {
+        // 로그인 상태 결정 (currentUser 또는 localStorage에서)
+        const isLoggedIn = this.currentUser !== null || savedUser !== null;
+        console.log('Final login state:', isLoggedIn);
+        
+        if (isLoggedIn) {
             console.log('User is logged in, updating UI...');
-            console.log('User details:', this.currentUser);
+            
+            // 사용자 정보가 없으면 localStorage에서 복원
+            if (!this.currentUser && savedUser) {
+                console.log('Restoring user from localStorage for UI update');
+                this.currentUser = savedUser;
+            }
+            
+            console.log('User details for UI update:', this.currentUser);
             
             // auth-buttons 내용을 안전하게 교체
             authButtons.innerHTML = `
@@ -231,7 +246,7 @@ class AuthManager {
             if (pointsBtn) {
                 const pointsText = pointsBtn.querySelector('.points-text');
                 console.log('Points text element:', pointsText);
-                console.log('User points:', this.currentUser.points);
+                console.log('User points:', this.currentUser ? this.currentUser.points : 'null');
                 
                 if (pointsText && this.currentUser && this.currentUser.points) {
                     pointsText.textContent = this.currentUser.points.toLocaleString() + ' P';
@@ -282,20 +297,25 @@ class AuthManager {
             return false;
         }
         
-        const wasWishlisted = toggleWishlist(this.currentUser, itemId);
-        this.saveUser(this.currentUser);
-        
-        // Update wishlist count on the item
-        const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
-        if (item) {
-            if (wasWishlisted) {
-                item.wishlistedCount--;
-            } else {
-                item.wishlistedCount++;
-            }
+        // TODO: 백엔드 위시리스트 API 호출 로직 구현 필요
+        // 현재는 임시로 토글 로직만 구현
+        const user = this.currentUser;
+        if (!user.wishlist) {
+            user.wishlist = [];
         }
         
-        return wasWishlisted;
+        const index = user.wishlist.indexOf(itemId);
+        if (index > -1) {
+            user.wishlist.splice(index, 1);
+            this.saveUser(user);
+            alert('찜 목록에서 제거되었습니다.');
+            return false; // removed from wishlist
+        } else {
+            user.wishlist.push(itemId);
+            this.saveUser(user);
+            alert('찜 목록에 추가되었습니다.');
+            return true; // added to wishlist
+        }
     }
 }
 
@@ -311,6 +331,10 @@ document.addEventListener('DOMContentLoaded', () => {
         authManager.currentUser = savedUser;
         authManager.initialized = true;
         console.log('User restored, initialized =', authManager.initialized);
+        
+        // 즉시 UI 업데이트
+        console.log('Forcing immediate UI update after user restoration');
+        authManager.updateUI();
     } else {
         console.log('No saved user found in localStorage');
     }

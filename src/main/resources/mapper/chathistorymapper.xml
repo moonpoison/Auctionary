@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.repository.ChatHistoryRepository">
+
+    <!-- 채팅방의 메시지를 시간순으로 조회 -->
+    <select id="findByChatIdOrderBySendDateAsc" resultType="edu.sm.dto.Chat_History">
+        SELECT message_id as messageId, chat_id as chatId, sender_id as senderId, 
+               content, send_date as sendDate, `read`
+        FROM Chat_History 
+        WHERE chat_id = #{chatId}
+        ORDER BY send_date ASC
+    </select>
+
+    <!-- 채팅방의 메시지를 최신순으로 조회 -->
+    <select id="findByChatIdOrderBySendDateDesc" resultType="edu.sm.dto.Chat_History">
+        SELECT message_id as messageId, chat_id as chatId, sender_id as senderId, 
+               content, send_date as sendDate, `read`
+        FROM Chat_History 
+        WHERE chat_id = #{chatId}
+        ORDER BY send_date DESC
+    </select>
+
+    <!-- 읽지 않은 메시지 수 조회 -->
+    <select id="countByChatIdAndSenderIdNotAndReadFalse" resultType="long">
+        SELECT COUNT(*)
+        FROM Chat_History 
+        WHERE chat_id = #{chatId} AND sender_id != #{userId} AND `read` = false
+    </select>
+
+    <!-- 특정 채팅방의 읽지 않은 메시지 조회 -->
+    <select id="findByChatIdAndReadFalse" resultType="edu.sm.dto.Chat_History">
+        SELECT message_id as messageId, chat_id as chatId, sender_id as senderId, 
+               content, send_date as sendDate, `read`
+        FROM Chat_History 
+        WHERE chat_id = #{chatId} AND `read` = false
+    </select>
+
+    <!-- 메시지 ID로 조회 -->
+    <select id="findById" resultType="edu.sm.dto.Chat_History">
+        SELECT message_id as messageId, chat_id as chatId, sender_id as senderId, 
+               content, send_date as sendDate, `read`
+        FROM Chat_History 
+        WHERE message_id = #{messageId}
+    </select>
+
+    <!-- 메시지 저장 -->
+    <insert id="save" parameterType="edu.sm.dto.Chat_History" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO Chat_History (chat_id, sender_id, content, send_date, `read`)
+        VALUES (#{chatId}, #{senderId}, #{content}, #{sendDate}, #{read})
+    </insert>
+
+</mapper> 

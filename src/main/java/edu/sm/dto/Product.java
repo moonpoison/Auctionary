@@ -2,7 +2,7 @@ package edu.sm.dto;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,8 +17,8 @@ public class Product {
     private String description;
     private String imagePath;
     private int categoryId;
-    private Date auctionStartDate;
-    private Date auctionEndDate;
+    private LocalDateTime auctionStartDate;
+    private LocalDateTime auctionEndDate;
     private int startingPrice;
     private int bidUnit;
     private String transactionStatus;

@@ -92,6 +92,7 @@
                                 <label for="itemName">상품명 *</label>
                                 <input type="text" id="itemName" name="name" required placeholder="상품명을 입력하세요">
                             </div>
+                            <br>
                             <!-- 대분류 -->
                             <div class="form-group">
                                 <label for="mainCategory">대분류 *</label>
