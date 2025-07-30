@@ -1,22 +1,28 @@
 
 package edu.sm.controller;
 
+import edu.sm.dto.Bid;
 import edu.sm.dto.Product;
 import edu.sm.dto.User;
+import edu.sm.exception.AuctionClosedException;
 import edu.sm.exception.ProductNotFoundException;
 import edu.sm.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Controller
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -60,4 +66,5 @@ public class ProductController {
             return new ResponseEntity<>("상품 조회 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

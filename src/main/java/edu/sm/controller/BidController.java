@@ -1,20 +1,21 @@
 package edu.sm.controller;
 
 import edu.sm.dto.Bid;
+import edu.sm.dto.Product;
 import edu.sm.dto.User;
 import edu.sm.exception.AuctionClosedException;
 import edu.sm.exception.InsufficientPointsException;
 import edu.sm.exception.InvalidBidPriceException;
 import edu.sm.exception.ProductNotFoundException;
 import edu.sm.service.BidService;
+import edu.sm.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/bids")
@@ -22,6 +23,8 @@ public class BidController {
 
     @Autowired
     private BidService bidService;
+    @Autowired
+    private ProductService productService;
 
     @PostMapping
     public ResponseEntity<?> placeBid(@RequestBody Bid bid, HttpSession session) {
@@ -46,4 +49,6 @@ public class BidController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("입찰 처리 중 알 수 없는 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+
 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -10,13 +9,30 @@
     </insert>
 
     <select id="selectAll" resultType="edu.sm.dto.Product">
-        SELECT product_id, user_id, product_name, description, image_path, category_id, auction_start_date, auction_end_date, starting_price, bid_unit, transaction_status
-        FROM product
+        SELECT
+            p.product_id, p.user_id, p.product_name, p.description, p.image_path,
+            p.category_id, p.auction_start_date, p.auction_end_date,
+            p.starting_price, p.bid_unit, p.transaction_status,
+            (
+                SELECT MAX(bid_price)
+                FROM bid
+                WHERE product_id = p.product_id
+            ) AS highest_bid
+        FROM product p
     </select>
 
     <select id="select" parameterType="int" resultType="edu.sm.dto.Product">
-        SELECT product_id, user_id, product_name, description, image_path, category_id, auction_start_date, auction_end_date, starting_price, bid_unit, transaction_status
-        FROM product
-        WHERE product_id = #{productId}
+        SELECT
+            p.product_id, p.user_id, p.product_name, p.description, p.image_path,
+            p.category_id, p.auction_start_date, p.auction_end_date,
+            p.starting_price, p.bid_unit, p.transaction_status,
+            (
+                SELECT MAX(bid_price)
+                FROM bid
+                WHERE product_id = p.product_id
+            ) AS highest_bid
+        FROM product p
+        WHERE p.product_id = #{productId}
     </select>
+
 </mapper>

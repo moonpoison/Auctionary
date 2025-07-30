@@ -20,6 +20,7 @@ class AuctionDetailManager {
     constructor() {
         this.currentItem = null;
         this.bidHistory = [];
+        this.highestBid = null;
         this.init();
     }
 
@@ -264,7 +265,8 @@ class AuctionDetailManager {
 
         const bidData = {
             productId: this.currentItem.productId,
-            bidPrice: bidAmount
+            bidPrice: bidAmount,
+            bidUserId: authManager.getCurrentUserId()
             // bidUserId와 bidDate는 서버에서 설정됨
         };
 

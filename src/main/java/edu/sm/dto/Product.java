@@ -22,4 +22,5 @@ public class Product {
     private int startingPrice;
     private int bidUnit;
     private String transactionStatus;
+    private Integer highestBid;
 }

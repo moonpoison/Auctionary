@@ -47,12 +47,7 @@ function formatPrice(price) {
 
 // Get current price of auction item
 function getCurrentPrice(item) {
-    // item.bids가 존재하고 배열이며, 요소가 있을 경우에만 입찰 금액 중 최대값을 반환
-    if (item.bids && Array.isArray(item.bids) && item.bids.length > 0) {
-        return Math.max(...item.bids.map(bid => bid.amount));
-    }
-    // 입찰 내역이 없거나 bids 필드가 없을 경우 startingPrice 반환
-    return item.startingPrice;
+    return item.highestBid ?? item.startingPrice;
 }
 
 // Check if user has wishlisted an item

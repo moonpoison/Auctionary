@@ -4,13 +4,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.sm.repository.BidRepository">
 
+    <!-- 입찰 추가 -->
     <insert id="insert" parameterType="edu.sm.dto.Bid">
         INSERT INTO bid (user_id, product_id, bid_price, bid_date)
         VALUES (#{bidUserId}, #{productId}, #{bidPrice}, #{bidDate})
     </insert>
 
-    <!-- 필요한 경우 select, selectAll 등 추가 -->
-
+    <!-- 최고 입찰 내역 조회 -->
     <select id="getHighestBid" parameterType="int" resultType="edu.sm.dto.Bid">
         SELECT
             user_id as bidUserId,
@@ -20,7 +20,14 @@
         FROM bid
         WHERE product_id = #{productId}
         ORDER BY bid_price DESC
-        LIMIT 1
+            LIMIT 1
+    </select>
+
+    <!-- 🔥 최고 입찰가만 조회 (현재가로 사용) -->
+    <select id="findHighestBidPriceByProductId" parameterType="int" resultType="int">
+        SELECT MAX(bid_price)
+        FROM bid
+        WHERE product_id = #{productId}
     </select>
 
 </mapper>

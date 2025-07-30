@@ -51,10 +51,7 @@ public class PointHistoryController {
         String userId = user.getUserId();
         int finalPoint = 0;
         try{
-            Point_History latestHistory = pointHistoryService.select(userId);
-            if (latestHistory != null) {
-                finalPoint = latestHistory.getFinalPoint();
-            }
+            finalPoint = pointHistoryService.select(userId);
         }catch(Exception e){
             e.printStackTrace();
         }

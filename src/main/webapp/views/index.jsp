@@ -84,7 +84,7 @@
                 <button class="sort-btn" data-sort="highPrice">높은가격순</button>
                 <button class="sort-btn" data-sort="lowPrice">낮은가격순</button>
             </div>
-            
+
             <div class="auction-grid" id="auctionGrid">
                 <!-- Auction cards will be dynamically generated here -->
             </div>

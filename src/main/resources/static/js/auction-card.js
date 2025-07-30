@@ -7,10 +7,12 @@ class AuctionCard {
     // Create auction card HTML
     createCard() {
         const currentPrice = getCurrentPrice(this.item);
+        console.log("🧾 카드 currentPrice:", currentPrice);
         const timeLeft = formatTimeRemaining(this.item.endDate);
         const user = authManager.getUser();
         const isWishlisted = user && user.wishlist && user.wishlist.includes(this.item.id);
-        
+        console.log("🎯 AuctionCard item:", this.item);
+        console.log("📌 highestBid:", this.item.highestBid);
         const card = document.createElement('div');
         card.className = 'auction-card';
         card.innerHTML = `
@@ -60,7 +62,7 @@ class AuctionCardManager {
     constructor() {
         this.cards = new Map();
     }
-    
+
     // Create and render auction card
     createCard(item) {
         const auctionCard = new AuctionCard(item);
