@@ -70,8 +70,9 @@ class PointsManager {
         const serverFinalPoint = document.getElementById('serverFinalPoint');
 
         if (currentPointsElement && serverFinalPoint) {
-            const points = serverFinalPoint.value;
-            currentPointsElement.textContent = points.toLocaleString() + ' P';
+            const points = parseInt(serverFinalPoint.value);
+            const formattedPoints = points.toLocaleString();
+            currentPointsElement.textContent = formattedPoints + ' P';
 
             // Update header points
             const pointsTextElement = document.querySelector('.points-text');
@@ -269,10 +270,8 @@ class PointsManager {
                 if (data.status === 'success') {
                     alert(`${formatPrice(amount)}이 출금 신청되었습니다.`);
 
-                    // ✅ 모달 닫기
                     this.closeWithdrawModal();
 
-                    // ✅ 최신 포인트 UI 반영
                     const currentPointsElement = document.getElementById('currentPoints');
                     const pointsTextElement = document.querySelector('.points-text');
 
@@ -283,7 +282,6 @@ class PointsManager {
                         pointsTextElement.textContent = data.finalPointAfterWithdraw.toLocaleString() + ' P';
                     }
 
-                    // ✅ 내역 갱신
                     this.loadPointsHistory();
                 } else {
                     alert(data.message || '출금 요청 처리 중 오류가 발생했습니다.');
