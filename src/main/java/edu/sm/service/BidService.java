@@ -24,12 +24,6 @@ public class BidService {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private PointService pointService;
-
-    @Autowired
-    private PointHistoryService pointHistoryService;
-
     @Transactional
     public int placeBid(Bid bid, String userId) {
         Product product = productService.getProductById(bid.getProductId());
@@ -59,30 +53,11 @@ public class BidService {
             throw new InvalidBidPriceException("입찰 가격은 입찰 단위(" + product.getBidUnit() + ")의 배수여야 합니다.");
         }
 
-        Point userPoint = pointService.getPoint(userId);
-        if (userPoint == null || userPoint.getPoint() < bid.getBidPrice()) {
-            throw new InsufficientPointsException("포인트가 부족합니다.");
-        }
-
-        // 포인트 차감
-        userPoint.setPoint(userPoint.getPoint() - bid.getBidPrice());
-        pointService.updatePoint(userPoint);
-
-        // 포인트 내역 기록
-        Point_History pointHistory = Point_History.builder()
-                .userId(userId)
-                .actionType("입찰")
-                .pointChange(-bid.getBidPrice())
-                .finalPoint(userPoint.getPoint())
-                .changeDate(LocalDateTime.now())
-                .note("상품 입찰: " + product.getProductName() + " (ID: " + product.getProductId() + ")")
-                .build();
-        pointHistoryService.recordPointHistory(pointHistory);
-
         bid.setBidUserId(userId);
         bid.setBidDate(LocalDateTime.now());
 
         int result = bidRepository.insert(bid);
+        System.out.println("Bid insert result: " + result); // Add this line
         return result;
     }
 }

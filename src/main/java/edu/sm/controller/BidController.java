@@ -42,6 +42,7 @@ public class BidController {
         } catch (AuctionClosedException | InvalidBidPriceException | InsufficientPointsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace(); // Add this line
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("입찰 처리 중 알 수 없는 오류가 발생했습니다: " + e.getMessage());
         }
     }

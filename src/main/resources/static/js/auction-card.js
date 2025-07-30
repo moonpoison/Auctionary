@@ -16,7 +16,7 @@ class AuctionCard {
         card.innerHTML = `
             <a href="auction-detail?id=${this.item.id}" class="auction-card-link">
                 <div class="auction-card-image">
-                    <img src="/uploads/${this.item.imagePath || 'placeholder.svg'}" alt="${this.item.name}" loading="lazy">
+                    <img src="${this.item.images && this.item.images[0] ? '/uploads/' + this.item.images[0] : '/images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
                     <div class="auction-card-badge ${timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1) ? 'urgent' : ''}">
                         ${timeLeft.text}
                     </div>

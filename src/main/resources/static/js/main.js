@@ -110,7 +110,10 @@ class AuctionApp {
                 status: 'active'
             }));
 
-            auctionCardManager.renderCards(items, grid);
+            // 현재 정렬 타입에 따라 상품 정렬
+            const sortedItems = sortAuctionItems(items, this.currentSort);
+
+            auctionCardManager.renderCards(sortedItems, grid);
         } catch (error) {
             console.error('상품 목록을 불러오는 중 오류 발생:', error);
             grid.innerHTML = '<p>상품 목록을 불러오는 중 오류가 발생했습니다.</p>';
@@ -201,36 +204,7 @@ class AuctionApp {
     }
 }
 
-// 카드 렌더링 매니저
-window.auctionCardManager = {
-    renderCards(items, container) {
-        container.innerHTML = '';
-        items.forEach(item => {
-            const html = `
-                <div class="auction-card">
-                    <img src="/uploads/${item.images[0]}" alt="${item.name}" class="auction-card-image">
-                    <div class="auction-card-content">
-                        <h4 class="auction-card-title">${item.name}</h4>
-                        <p class="auction-card-price">${formatPrice(item.startingPrice)} 원</p>
-                        <p class="auction-card-time">남은 시간: ${getTimeRemaining(item.endDate)}</p>
-                        <button class="btn btn-primary btn-sm">입찰하기</button>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += html;
-        });
-    },
 
-    updateTimers(items = []) {
-        const timeElements = document.querySelectorAll('.auction-card-time');
-        timeElements.forEach((el, i) => {
-            const item = items[i];
-            if (item) {
-                el.textContent = `남은 시간: ${getTimeRemaining(item.endDate)}`;
-            }
-        });
-    }
-};
 
 // 유틸 함수들
 function formatPrice(price) {
@@ -254,7 +228,22 @@ function sortAuctionItems(items, sortType) {
     const sorted = [...items];
     switch (sortType) {
         case 'closing':
-            return sorted.sort((a, b) => new Date(a.auctionEndDate) - new Date(b.auctionEndDate));
+            return sorted.sort((a, b) => {
+                const now = new Date();
+                const aEnded = new Date(a.endDate) < now;
+                const bEnded = new Date(b.endDate) < now;
+
+                console.log(`Comparing ${a.name} (ended: ${aEnded}, endDate: ${a.endDate}, parsedEndDate: ${new Date(a.endDate)}, now: ${now}) with ${b.name} (ended: ${bEnded}, endDate: ${b.endDate}, parsedEndDate: ${new Date(b.endDate)}, now: ${now})`);
+
+                if (aEnded && !bEnded) {
+                    return 1; // a (ended) comes after b (not ended)
+                }
+                if (!aEnded && bEnded) {
+                    return -1; // a (not ended) comes before b (ended)
+                }
+                // If both are ended or both are not ended, sort by end date
+                return new Date(a.endDate) - new Date(b.endDate);
+            });
         case 'popular':
             return sorted.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
         case 'newest':

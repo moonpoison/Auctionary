@@ -13,7 +13,7 @@
 
     <select id="getHighestBid" parameterType="int" resultType="edu.sm.dto.Bid">
         SELECT
-            bid_user_id as bidUserId,
+            user_id as bidUserId,
             product_id as productId,
             bid_price as bidPrice,
             bid_date as bidDate
