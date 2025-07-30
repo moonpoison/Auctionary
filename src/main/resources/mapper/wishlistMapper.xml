@@ -11,4 +11,10 @@
         WHERE w.user_id = #{userId}
     </select>
 
+    <select id="countByUserId" parameterType="String" resultType="int">
+        SELECT count(*)
+        FROM Wishlist
+        WHERE user_id = #{userId}
+    </select>
+
 </mapper>

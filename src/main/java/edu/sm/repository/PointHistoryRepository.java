@@ -9,4 +9,7 @@ import java.util.List;
 @Mapper
 public interface PointHistoryRepository {
     List<Point_History> findByUserId(String userId);
+
+    Integer findLatestPointsByUserId(String userId);
+
 }

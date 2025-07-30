@@ -10,4 +10,6 @@ import java.util.List;
 @Mapper
 public interface WishlistRepository {
     List<Product> findWishlistProductsByUserId(String userId);
+
+    int countByUserId(String userId);
 }

@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%-- JSTL(c, fmt) 태그 라이브러리를 사용하기 위한 선언문 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -88,15 +87,16 @@
                         <img src="../images/placeholder.svg" alt="프로필" class="profile-avatar">
                         <div class="profile-info">
                             <h2 id="userName">${userProfile.name} (${userProfile.userId})</h2>
-
                             <p id="userEmail">${userProfile.email}</p>
                             <div class="profile-stats">
                                 <div class="stat">
-                                    <span class="stat-value" id="userPoints">...</span>
+                                        <span class="stat-value" id="userPoints">
+                                            <fmt:formatNumber value="${userPoints}" pattern="#,###" />
+                                        </span>
                                     <span class="stat-label">포인트</span>
                                 </div>
                                 <div class="stat">
-                                    <span class="stat-value" id="wishlistCount">...</span>
+                                    <span class="stat-value" id="wishlistCount">${wishlistCount}</span>
                                     <span class="stat-label">찜한 상품</span>
                                 </div>
                             </div>

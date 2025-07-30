@@ -16,4 +16,8 @@ public class WishlistService {
     public List<Product> getWishlistProducts(String userId) {
         return wishlistRepository.findWishlistProductsByUserId(userId);
     }
+
+    public int getWishlistCount(String userId) {
+        return wishlistRepository.countByUserId(userId);
+    }
 }
