@@ -7,18 +7,16 @@ class AuctionCard {
     // Create auction card HTML
     createCard() {
         const currentPrice = getCurrentPrice(this.item);
-        console.log("🧾 카드 currentPrice:", currentPrice);
         const timeLeft = formatTimeRemaining(this.item.endDate);
         const user = authManager.getUser();
         const isWishlisted = user && user.wishlist && user.wishlist.includes(this.item.id);
-        console.log("🎯 AuctionCard item:", this.item);
-        console.log("📌 highestBid:", this.item.highestBid);
+        
         const card = document.createElement('div');
         card.className = 'auction-card';
         card.innerHTML = `
             <a href="auction-detail?id=${this.item.id}" class="auction-card-link">
                 <div class="auction-card-image">
-                    <img src="${this.item.images && this.item.images[0] ? '/uploads/' + this.item.images[0] : '/images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
+                    <img src="${this.item.images[0] || 'images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
                     <div class="auction-card-badge ${timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1) ? 'urgent' : ''}">
                         ${timeLeft.text}
                     </div>
@@ -31,7 +29,7 @@ class AuctionCard {
                 </div>
                 <div class="auction-card-content">
                     <div class="auction-card-tags">
-                        <span class="auction-card-tag">${this.item.tags[0]}</span>
+                        ${this.item.tags.slice(0, 2).map(tag => `<span class="auction-card-tag">${tag}</span>`).join('')}
                     </div>
                     <h3 class="auction-card-title">${this.item.name}</h3>
                     <div class="auction-card-seller">
@@ -62,7 +60,7 @@ class AuctionCardManager {
     constructor() {
         this.cards = new Map();
     }
-
+    
     // Create and render auction card
     createCard(item) {
         const auctionCard = new AuctionCard(item);
@@ -105,14 +103,21 @@ class AuctionCardManager {
             button.classList.add('active');
         }
         
-        // 위시리스트 카운트 업데이트 로직은 백엔드 연동 후 구현
-        // 현재는 MOCK_AUCTION_ITEMS를 사용하지 않으므로 제거
+        // Update wishlist count
+        const card = this.cards.get(itemId);
+        if (card) {
+            const wishlistCount = card.querySelector('.auction-card-wishlist-count span');
+            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
+            if (wishlistCount && item) {
+                wishlistCount.textContent = item.wishlistedCount;
+            }
+        }
     }
     
     // Update countdown timers
-    updateTimers(items) {
+    updateTimers() {
         this.cards.forEach((card, itemId) => {
-            const item = items.find(i => i.id === itemId);
+            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
             if (item && item.status === 'active') {
                 const badge = card.querySelector('.auction-card-badge');
                 if (badge) {

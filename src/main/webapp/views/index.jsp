@@ -84,7 +84,7 @@
                 <button class="sort-btn" data-sort="highPrice">높은가격순</button>
                 <button class="sort-btn" data-sort="lowPrice">낮은가격순</button>
             </div>
-
+            
             <div class="auction-grid" id="auctionGrid">
                 <!-- Auction cards will be dynamically generated here -->
             </div>
@@ -104,6 +104,7 @@
         </div>
     </div>
 
+    <script src="/js/mock-data.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/chat.js"></script>

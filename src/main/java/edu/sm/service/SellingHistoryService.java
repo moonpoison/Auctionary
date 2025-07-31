@@ -1,6 +1,6 @@
 package edu.sm.service;
 
-import edu.sm.dto.Product_;
+import edu.sm.dto.Product;
 import edu.sm.repository.SellingHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

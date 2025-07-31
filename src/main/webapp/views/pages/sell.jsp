@@ -92,22 +92,16 @@
                                 <label for="itemName">상품명 *</label>
                                 <input type="text" id="itemName" name="name" required placeholder="상품명을 입력하세요">
                             </div>
-                            <br>
-                            <!-- 대분류 -->
                             <div class="form-group">
-                                <label for="mainCategory">대분류 *</label>
-                                <select id="mainCategory" name="mainCategory" required>
-                                    <option value="">대분류를 선택하세요</option>
-                                    <!-- JavaScript로 동적 삽입 -->
-                                </select>
-                            </div>
-
-                            <!-- 중분류 -->
-                            <div class="form-group">
-                                <label for="subCategory">중분류 *</label>
-                                <select id="subCategory" name="category" required>
-                                    <option value="">중분류를 선택하세요</option>
-                                    <!-- JavaScript로 동적 삽입 -->
+                                <label for="itemCategory">카테고리 *</label>
+                                <select id="itemCategory" name="category" required>
+                                    <option value="">카테고리를 선택하세요</option>
+                                    <option value="디지털 기기">디지털 기기</option>
+                                    <option value="명품">명품</option>
+                                    <option value="한정판 굿즈">한정판 굿즈</option>
+                                    <option value="책">책</option>
+                                    <option value="취미용품">취미용품</option>
+                                    <option value="기타">기타</option>
                                 </select>
                             </div>
                         </div>
@@ -122,7 +116,7 @@
                             <input type="text" id="itemTags" name="tags" placeholder="태그를 쉼표로 구분하여 입력하세요 (예: 한정판, 레트로, 게임기)">
                         </div>
                     </div>
-
+                    
                     <div class="form-section">
                         <h3>이미지</h3>
                         <div class="image-upload">
@@ -154,10 +148,19 @@
                             </div>
                         </div>
                         
+                        <div class="form-group">
+                            <label for="buyNowPrice">즉시구매가 (선택사항)</label>
+                            <input type="number" id="buyNowPrice" name="buyNowPrice" min="1000" step="1000" placeholder="즉시구매가를 입력하세요">
+                        </div>
+                        
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="endDate">경매 종료일 *</label>
                                 <input type="datetime-local" id="endDate" name="endDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endTime">경매 종료시간 *</label>
+                                <input type="time" id="endTime" name="endTime" required>
                             </div>
                         </div>
                     </div>

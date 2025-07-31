@@ -2,7 +2,7 @@ package edu.sm.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -10,17 +10,18 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@Data
 public class Product {
-    private int productId;
-    private String userId;
+    private String productId;
     private String productName;
     private String description;
     private String imagePath;
-    private int categoryId;
-    private LocalDateTime auctionStartDate;
-    private LocalDateTime auctionEndDate;
-    private int startingPrice;
-    private int bidUnit;
+    private String categoryId;
+    private Timestamp auctionStartDate;
+    private Timestamp auctionEndDate;
+    private double startingPrice;
+    private double bidUnit;
+    private String registerUserId;
     private String transactionStatus;
-    private Integer highestBid;
 }
+//product_id, product_name, description, image_path, category_id, auction_start_date, acution_end_date, starting_price, bid_unit, register_user_id(user_id), transaction_status

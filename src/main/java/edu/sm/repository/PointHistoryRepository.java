@@ -17,7 +17,5 @@ public interface PointHistoryRepository {
 
     List<Point_History> selectAll(String userId) throws Exception;
 
-    Point_History Select(String userId) throws Exception;
-
     Integer select(String userId) throws Exception;
 }

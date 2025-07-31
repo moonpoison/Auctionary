@@ -1,7 +1,7 @@
 package edu.sm.service;
 
 import edu.sm.dto.Bid;
-import edu.sm.dto.Product_;
+import edu.sm.dto.Product;
 import edu.sm.repository.BidRepository;
 import edu.sm.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +46,14 @@ public class BidHistoryService {
                 .distinct()
                 .toList();
 
-        Map<String, Product_> prodMap =
+        Map<String, Product> prodMap =
                 prodRepo.findByIds(ids).stream()
-                        .collect(Collectors.toMap(Product_::getProductId, p -> p));
+                        .collect(Collectors.toMap(Product::getProductId, p -> p));
 
         // 3) 최고가 계산 (간단히: myBid가 이미 최고가라고 가정)
         return myBids.stream()
                 .map(b -> {
-                    Product_ p = prodMap.get(String.valueOf(b.getProductId()));
+                    Product p = prodMap.get(String.valueOf(b.getProductId()));
                     return new BidHistoryView(
                             String.valueOf(b.getProductId()),
                             p != null ? p.getProductName() : "(삭제됨)",
