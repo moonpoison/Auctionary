@@ -298,9 +298,14 @@
 
 /* Wishlist Grid */
 .wishlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
+    /* grid → flex (세로 한 줄) */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;          /* 구매/판매 리스트와 동일 간격 */
+}
+/* 리스트 카드가 부모 폭 100% 차지 */
+.wishlist-grid .list-item {
+    width: 100%;
 }
 
 /* Reviews */
@@ -358,24 +363,24 @@
         flex-direction: column;
         text-align: center;
     }
-    
+
     .profile-stats {
         justify-content: center;
     }
-    
+
     .overview-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .tabs {
         gap: 4px;
     }
-    
+
     .tab-btn {
         padding: 6px 12px;
         font-size: 13px;
     }
-    
+
     .wishlist-grid {
         grid-template-columns: 1fr;
     }
@@ -385,18 +390,18 @@
     .profile-card {
         padding: 16px;
     }
-    
+
     .tab-pane {
         padding: 16px;
     }
-    
+
     .list-item {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .list-item-image {
         width: 80px;
         height: 80px;
     }
-} 
+}
