@@ -51,16 +51,17 @@ class AuctionDetailManager {
             <div class="auction-detail-container">
                 <div class="auction-detail-images">
                     <div class="main-image">
-                        <img src="${this.currentItem.imagePath ? '/images/' + this.currentItem.imagePath : '/images/placeholder.svg'}" alt="${this.currentItem.productName}" id="mainImage">
+                        <img src="${this.currentItem.imagePath ? (this.currentItem.imagePath.startsWith('/images/') ? this.currentItem.imagePath : '/images/' + this.currentItem.imagePath) : '/images/placeholder.svg'}" 
+                            alt="${this.currentItem.productName}" id="mainImage">
                     </div>
                     <div class="image-thumbnails">
                         ${this.currentItem.imagePath ? `
-                            <div class="thumbnail active" onclick="auctionDetailManager.changeImage('/images/${this.currentItem.imagePath}', this)">
-                                <img src="/images/${this.currentItem.imagePath}" alt="${this.currentItem.productName}">
+                            <div class="thumbnail active" onclick="auctionDetailManager.changeImage('${this.currentItem.imagePath.startsWith('/images/') ? this.currentItem.imagePath : '/images/' + this.currentItem.imagePath}', this)">
+                                <img src="${this.currentItem.imagePath.startsWith('/images/') ? this.currentItem.imagePath : '/images/' + this.currentItem.imagePath}" alt="${this.currentItem.productName}">
                             </div>
                         ` : ''}
                     </div>
-                </div>
+            </div>
 
                 <div class="auction-detail-info">
                     <div class="auction-detail-header">
