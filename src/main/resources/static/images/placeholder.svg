@@ -1,1 +1,7 @@
- 
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f3f4f6"/>
+  <rect x="50" y="50" width="300" height="200" fill="#e5e7eb" stroke="#d1d5db" stroke-width="2"/>
+  <circle cx="200" cy="120" r="30" fill="#9ca3af"/>
+  <path d="M150 180 L250 180 M150 200 L250 200 M150 220 L200 220" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+  <text x="200" y="270" text-anchor="middle" fill="#6b7280" font-family="Arial, sans-serif" font-size="14">이미지를 불러올 수 없습니다</text>
+</svg> 

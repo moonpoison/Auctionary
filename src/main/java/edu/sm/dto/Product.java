@@ -12,15 +12,15 @@ import java.sql.Timestamp;
 @Builder
 @Data
 public class Product {
-    private String productId;
+    private int productId;
     private String productName;
     private String description;
     private String imagePath;
-    private String categoryId;
+    private int categoryId;
     private Timestamp auctionStartDate;
     private Timestamp auctionEndDate;
-    private double startingPrice;
-    private double bidUnit;
+    private int startingPrice;
+    private int bidUnit;
     private String registerUserId;
     private String registerUserName;
     private String transactionStatus;

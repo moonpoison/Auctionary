@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
   servlet:
     encoding:
       charset: UTF-8
@@ -24,12 +24,9 @@ spring:
       suffix: .jsp
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.64/auctionary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: tester
+    url: jdbc:mysql://localhost:3306/action?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
     password: 1234
-#    url: jdbc:mysql://localhost:3306/pjt?serverTimezone=UTC&useSSL=false
-#    username: root
-#    password: 111111
 
 mybatis:
   type-aliases-package: edu.sm.dto
@@ -40,7 +37,7 @@ mybatis:
 logging:
   level:
     root: info
-
+    edu.sm: debug  # SQL 로그 확인용
 
 app:
   dir:

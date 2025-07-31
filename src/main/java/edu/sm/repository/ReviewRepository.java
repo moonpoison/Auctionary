@@ -1,5 +1,6 @@
 package edu.sm.repository;
 
+import edu.sm.dto.Review;
 import lombok.Data;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,19 @@ public interface ReviewRepository {
 
     /** 로그인 사용자가 받은 모든 리뷰 */
     List<ReviewVO> findReceived(@Param("userId") String userId);
+    
+    /** 리뷰 작성 */
+    void insertReview(Review review);
+    
+    /** 상품별 리뷰 조회 */
+    List<Review> findByProductId(@Param("productId") int productId);
+    
+    /** 사용자가 작성한 리뷰 조회 */
+    List<ReviewVO> findWritten(@Param("userId") String userId);
+    
+    /** 리뷰 ID로 조회 */
+    Review findById(@Param("reviewId") int reviewId);
+    
+    /** 리뷰 삭제 */
+    void deleteReview(@Param("reviewId") int reviewId);
 }

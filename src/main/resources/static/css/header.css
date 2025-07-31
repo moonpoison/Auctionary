@@ -134,6 +134,36 @@
     margin-left: auto;
 }
 
+/* 찜 개수 표시 스타일 */
+.wishlist-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    min-width: 18px;
+}
+
+#wishlistBtn {
+    position: relative;
+}
+
+#wishlistBtn .wishlist-count {
+    display: none; /* 기본적으로 숨김 */
+}
+
+#wishlistBtn .wishlist-count:not(:empty) {
+    display: flex; /* 내용이 있을 때만 표시 */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .header-content {

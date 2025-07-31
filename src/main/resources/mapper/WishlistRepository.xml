@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.sm.repository.WishlistRepository">
 
-    <resultMap id="ProductMap" type="edu.sm.dto.Product">
-        <id     property="productId"       column="product_id"/>
-        <result property="productName"     column="product_name"/>
-        <result property="imagePath"       column="image_path"/>
-        <result property="transactionStatus" column="transaction_status"/>
-        <result property="startingPrice"   column="starting_price"/>
-    </resultMap>
-
-    <select id="findWishlist" parameterType="string" resultMap="ProductMap">
-        SELECT p.*
-        FROM   Wishlist w
-                   JOIN   Product  p ON p.product_id = w.product_id
-        WHERE  w.user_id = #{userId}
-        ORDER  BY p.product_id DESC
+    <!-- 찜한 상품 리스트 조회 -->
+    <select id="findWishlist" parameterType="string" resultType="edu.sm.dto.Product">
+        SELECT p.product_id, p.product_name, p.image_path, p.starting_price, p.transaction_status
+        FROM Product p
+        INNER JOIN Wishlist w ON p.product_id = w.product_id
+        WHERE w.user_id = #{userId}
+        ORDER BY p.created_at DESC
     </select>
+    
+    <!-- 찜 추가 -->
+    <insert id="addToWishlist">
+        INSERT INTO Wishlist (user_id, product_id)
+        VALUES (#{userId}, #{productId})
+    </insert>
+    
+    <!-- 찜 제거 -->
+    <delete id="removeFromWishlist">
+        DELETE FROM Wishlist 
+        WHERE user_id = #{userId} AND product_id = #{productId}
+    </delete>
+    
+    <!-- 찜 여부 확인 -->
+    <select id="isWishlisted" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM Wishlist 
+        WHERE user_id = #{userId} AND product_id = #{productId}
+    </select>
+    
+    <!-- 상품별 찜 개수 조회 -->
+    <select id="getWishlistCount" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM Wishlist 
+        WHERE product_id = #{productId}
+    </select>
+    
 </mapper>
