@@ -9,6 +9,7 @@ class AuctionApp {
         await this.fetchProducts(); // 상품 목록을 먼저 가져옴
         this.setupEventListeners();
         this.startTimer();
+        this.updateWishlistCount(); // 찜 개수 업데이트
     }
 
     // Fetch products from the server
@@ -39,11 +40,54 @@ class AuctionApp {
                 tags: ['일반']
             }));
 
+            // 각 상품의 최고가를 서버에서 가져와서 업데이트
+            await this.updateProductPrices();
+            await this.updateProductWishlistCounts(); // 찜 개수 업데이트
+
             console.log('Products fetched:', this.products);
         } catch (error) {
             console.error('Error fetching products:', error);
             this.products = [];
         }
+    }
+
+    // 각 상품의 최고가를 서버에서 가져와서 업데이트
+    async updateProductPrices() {
+        const pricePromises = this.products.map(async (product) => {
+            try {
+                const response = await fetch(`/api/bids/product/${product.id}/max`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const maxBid = data.maxBid;
+                    product.highestBid = maxBid > 0 ? maxBid : product.startingPrice;
+                }
+            } catch (error) {
+                console.error(`상품 ${product.id} 최고가 조회 오류:`, error);
+                // 오류 시 시작가 유지
+                product.highestBid = product.startingPrice;
+            }
+        });
+
+        await Promise.all(pricePromises);
+    }
+
+    // 각 상품의 찜 개수를 서버에서 가져와서 업데이트
+    async updateProductWishlistCounts() {
+        const wishlistPromises = this.products.map(async (product) => {
+            try {
+                const response = await fetch(`/api/wishlist/product/${product.id}/count`);
+                if (response.ok) {
+                    const data = await response.json();
+                    product.wishlistedCount = data.count || 0;
+                }
+            } catch (error) {
+                console.error(`상품 ${product.id} 찜 개수 조회 오류:`, error);
+                // 오류 시 0으로 설정
+                product.wishlistedCount = 0;
+            }
+        });
+
+        await Promise.all(wishlistPromises);
     }
 
     // Setup event listeners
@@ -196,6 +240,54 @@ class AuctionApp {
         setInterval(() => {
             auctionCardManager.updateTimers(this.products);
         }, 1000);
+        
+        // 가격 업데이트 타이머 (30초마다)
+        setInterval(async () => {
+            await this.updateProductPrices();
+            await this.updateProductWishlistCounts(); // 찜 개수 업데이트
+            this.renderAuctionGrid();
+        }, 30000);
+    }
+
+    // 찜 개수 업데이트
+    async updateWishlistCount() {
+        try {
+            // 로그인 상태 확인
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                this.setWishlistCount(0);
+                return;
+            }
+
+            const response = await fetch('/api/wishlist', {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const wishlist = await response.json();
+                this.setWishlistCount(wishlist.length);
+            } else {
+                this.setWishlistCount(0);
+            }
+        } catch (error) {
+            console.error('찜 개수 업데이트 오류:', error);
+            this.setWishlistCount(0);
+        }
+    }
+
+    // 찜 개수 표시
+    setWishlistCount(count) {
+        const wishlistCountElement = document.querySelector('.wishlist-count');
+        if (wishlistCountElement) {
+            wishlistCountElement.textContent = count;
+            
+            // 찜 개수가 0이면 숨기기, 있으면 보이기
+            if (count > 0) {
+                wishlistCountElement.style.display = 'inline';
+            } else {
+                wishlistCountElement.style.display = 'none';
+            }
+        }
     }
 }
 

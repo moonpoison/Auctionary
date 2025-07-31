@@ -20,14 +20,14 @@ public class PurchasedHistoryService {
             String  productId,
             String  productName,
             String  imagePath,
-            double  finalPrice,
+            int     finalPrice,
             Timestamp auctionEndDate
     ) {}
 
     public List<PurchasedView> getPurchased(String buyerId) {
         return repo.findByBuyer(buyerId).stream()
                 .map(p -> new PurchasedView(
-                        p.getProductId(),
+                        String.valueOf(p.getProductId()),
                         p.getProductName(),
                         p.getImagePath(),
                         /* final_price 별칭은 MyBatis가 알 수 없어 ResultSet에서 startingPrice에 담김 */

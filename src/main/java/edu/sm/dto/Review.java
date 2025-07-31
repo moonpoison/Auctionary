@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class Review {
+    private int reviewId;
+    private int tradeId;
     private String reviewerId;
     private int productId;
     private int rating;

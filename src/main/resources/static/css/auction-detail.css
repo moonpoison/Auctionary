@@ -1,4 +1,259 @@
 /* Auction Detail Page Styles */
+
+/* 새로운 레이아웃 스타일 */
+.auction-header {
+    margin-bottom: 2rem;
+}
+
+.auction-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+}
+
+.auction-status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.auction-status.auctioning {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.auction-status.ended {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.auction-status.sold {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.auction-image {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.auction-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.auction-info {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.price-section {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.price-section > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.amount {
+    font-weight: 700;
+    color: #111827;
+}
+
+.current-price .amount {
+    font-size: 1.5rem;
+    color: #dc2626;
+}
+
+.time-section {
+    padding: 1rem;
+    background: #fef3c7;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.time-left .amount {
+    font-size: 1.25rem;
+    color: #92400e;
+}
+
+.time-left .amount.expired {
+    color: #dc2626;
+}
+
+.auction-dates {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #92400e;
+}
+
+.action-section {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.bid-button {
+    flex: 2;
+    padding: 1rem 2rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bid-button:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.bid-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.wishlist-button {
+    flex: 1;
+    padding: 1rem;
+    background: white;
+    color: #374151;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.wishlist-button:hover {
+    border-color: #9ca3af;
+}
+
+.wishlist-button.wishlisted {
+    background: #fef3c7;
+    border-color: #fbbf24;
+    color: #92400e;
+}
+
+.auction-description {
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.auction-description h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.auction-description p {
+    margin: 0;
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* 탭 스타일 */
+.auction-tabs {
+    margin-top: 2rem;
+}
+
+.tab-buttons {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+.tab-button {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.tab-button:hover {
+    color: #374151;
+}
+
+.tab-button.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 입찰 내역 스타일 */
+.bid-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.bid-user {
+    font-weight: 600;
+    color: #111827;
+}
+
+.bid-price {
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.bid-time {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.no-bids {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+/* 기존 스타일들 유지 */
 .auction-detail-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -404,5 +659,17 @@
         min-width: 100px;
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
+    }
+    
+    .action-section {
+        flex-direction: column;
+    }
+    
+    .bid-button {
+        flex: none;
+    }
+    
+    .wishlist-button {
+        flex: none;
     }
 } 
