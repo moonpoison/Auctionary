@@ -35,6 +35,20 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProductById(@PathVariable int productId) {
+        try {
+            Product product = productService.select(productId);
+            if (product != null) {
+                return ResponseEntity.ok(product);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> registerProduct(@RequestBody Product product, HttpSession session) {
         // ✅ 로그인된 유저 정보 추출

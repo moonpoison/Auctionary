@@ -12,4 +12,6 @@ public interface ProductRepository {
     void insertProduct(Product product);
 
     List<Product> selectAll();
+
+    Product select(int productId);
 }

@@ -1,19 +1,3 @@
-// Sell Page Logic
-const CATEGORY_LIST = [
-    { id: 1, name: "전자제품", parentId: null },
-    { id: 2, name: "패션의류", parentId: null },
-    { id: 3, name: "도서/음반", parentId: null },
-    { id: 4, name: "가구/인테리어", parentId: null },
-    { id: 5, name: "노트북/PC", parentId: 1 },
-    { id: 6, name: "휴대폰", parentId: 1 },
-    { id: 7, name: "남성 의류", parentId: 2 },
-    { id: 8, name: "여성 의류", parentId: 2 },
-    { id: 9, name: "소설", parentId: 3 },
-    { id: 10, name: "로맨스", parentId: 3 },
-    { id: 11, name: "침대", parentId: 4 },
-    { id: 12, name: "소파", parentId: 4 }
-];
-
 class SellManager {
     constructor() {
         this.uploadedImages = [];

@@ -3,20 +3,20 @@ class AuctionCard {
     constructor(item) {
         this.item = item;
     }
-    
+
     // Create auction card HTML
     createCard() {
         const currentPrice = getCurrentPrice(this.item);
         const timeLeft = formatTimeRemaining(this.item.endDate);
         const user = authManager.getUser();
         const isWishlisted = user && user.wishlist && user.wishlist.includes(this.item.id);
-        
+
         const card = document.createElement('div');
         card.className = 'auction-card';
         card.innerHTML = `
             <a href="auction-detail?id=${this.item.id}" class="auction-card-link">
                 <div class="auction-card-image">
-                    <img src="${this.item.images[0] || 'images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
+                    <img src="${this.item.images && this.item.images[0] ? '/images/' + this.item.images[0] : '/images/placeholder.svg'}" alt="${this.item.name}" loading="lazy">
                     <div class="auction-card-badge ${timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1) ? 'urgent' : ''}">
                         ${timeLeft.text}
                     </div>
@@ -29,7 +29,7 @@ class AuctionCard {
                 </div>
                 <div class="auction-card-content">
                     <div class="auction-card-tags">
-                        ${this.item.tags.slice(0, 2).map(tag => `<span class="auction-card-tag">${tag}</span>`).join('')}
+                        <span class="auction-card-tag">${this.item.tags[0]}</span>
                     </div>
                     <h3 class="auction-card-title">${this.item.name}</h3>
                     <div class="auction-card-seller">
@@ -50,7 +50,7 @@ class AuctionCard {
                 </div>
             </a>
         `;
-        
+
         return card;
     }
 }
@@ -60,73 +60,53 @@ class AuctionCardManager {
     constructor() {
         this.cards = new Map();
     }
-    
-    // Create and render auction card
+
     createCard(item) {
         const auctionCard = new AuctionCard(item);
         const cardElement = auctionCard.createCard();
         this.cards.set(item.id, cardElement);
         return cardElement;
     }
-    
-    // Render all auction cards
+
     renderCards(items, container) {
-        console.log('Rendering cards for items:', items);
-        console.log('Container:', container);
-        
         if (!container) {
-            console.error('Container is null');
+            console.error('🛑 Container is null');
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         if (!items || items.length === 0) {
             container.innerHTML = '<div style="text-align: center; padding: 20px; color: #6b7280;">표시할 상품이 없습니다.</div>';
             return;
         }
-        
+
         items.forEach(item => {
-            console.log('Creating card for item:', item);
             const card = this.createCard(item);
             container.appendChild(card);
         });
     }
-    
-    // Toggle wishlist for an item
+
     toggleWishlist(itemId, button) {
         const wasWishlisted = authManager.toggleWishlist(itemId);
-        
         if (wasWishlisted) {
             button.classList.remove('active');
         } else {
             button.classList.add('active');
         }
-        
-        // Update wishlist count
-        const card = this.cards.get(itemId);
-        if (card) {
-            const wishlistCount = card.querySelector('.auction-card-wishlist-count span');
-            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
-            if (wishlistCount && item) {
-                wishlistCount.textContent = item.wishlistedCount;
-            }
-        }
+        // TODO: 백엔드에 위시리스트 상태 반영 추가 가능
     }
-    
-    // Update countdown timers
-    updateTimers() {
+
+    updateTimers(items) {
         this.cards.forEach((card, itemId) => {
-            const item = MOCK_AUCTION_ITEMS.find(i => i.id === itemId);
+            const item = items.find(i => i.id === itemId);
             if (item && item.status === 'active') {
                 const badge = card.querySelector('.auction-card-badge');
                 if (badge) {
                     const timeLeft = formatTimeRemaining(item.endDate);
                     badge.textContent = timeLeft.text;
-                    
-                    if (timeLeft.isOver) {
-                        badge.classList.add('urgent');
-                    } else if (timeLeft.days === 0 && timeLeft.hours < 1) {
+
+                    if (timeLeft.isOver || (timeLeft.days === 0 && timeLeft.hours < 1)) {
                         badge.classList.add('urgent');
                     } else {
                         badge.classList.remove('urgent');
@@ -137,5 +117,6 @@ class AuctionCardManager {
     }
 }
 
-// Initialize auction card manager
-const auctionCardManager = new AuctionCardManager(); 
+// 전역 등록
+const auctionCardManager = new AuctionCardManager();
+window.auctionCardManager = auctionCardManager;

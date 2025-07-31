@@ -44,7 +44,7 @@
 
     <select id="selectAll" resultType="edu.sm.dto.Product">
         SELECT
-            p.product_id, p.user_id, p.product_name, p.description, p.image_path,
+            p.product_id, p.user_id, u.name AS register_user_name, p.product_name, p.description, p.image_path,
             p.category_id, p.auction_start_date, p.auction_end_date,
             p.starting_price, p.bid_unit, p.transaction_status,
             (
@@ -53,11 +53,12 @@
                 WHERE product_id = p.product_id
             ) AS highest_bid
         FROM product p
+        JOIN user u ON p.user_id = u.user_id
     </select>
 
     <select id="select" parameterType="int" resultType="edu.sm.dto.Product">
         SELECT
-            p.product_id, p.user_id, p.product_name, p.description, p.image_path,
+            p.product_id, p.user_id, u.name AS register_user_name, p.product_name, p.description, p.image_path,
             p.category_id, p.auction_start_date, p.auction_end_date,
             p.starting_price, p.bid_unit, p.transaction_status,
             (
@@ -66,6 +67,7 @@
                 WHERE product_id = p.product_id
             ) AS highest_bid
         FROM product p
+        JOIN user u ON p.user_id = u.user_id
         WHERE p.product_id = #{productId}
     </select>
 

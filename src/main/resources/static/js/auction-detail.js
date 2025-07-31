@@ -1,73 +1,83 @@
-// Auction Detail Page Manager
 class AuctionDetailManager {
     constructor() {
         this.currentItem = null;
         this.bidHistory = [];
+        this.highestBid = null;
         this.init();
     }
-    
-    init() {
+
+    async init() { // async 키워드 추가
         // Get auction ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const auctionId = urlParams.get('id');
-        
+
         if (!auctionId) {
             this.showError('상품 ID가 없습니다.');
             return;
         }
-        
-        // Find the auction item
-        this.currentItem = MOCK_AUCTION_ITEMS.find(item => item.id === auctionId);
-        
-        if (!this.currentItem) {
-            this.showError('상품을 찾을 수 없습니다.');
-            return;
+
+        try {
+            // 백엔드 API 호출하여 상품 정보 가져오기
+            const response = await fetch(`/api/products/${auctionId}`);
+            if (!response.ok) {
+                throw new Error('상품 정보를 불러오는데 실패했습니다.');
+            }
+            this.currentItem = await response.json();
+
+            if (!this.currentItem) {
+                this.showError('상품을 찾을 수 없습니다.');
+                return;
+            }
+
+            this.renderAuctionDetail();
+            this.setupEventListeners();
+            this.startCountdown();
+        } catch (error) {
+            console.error('상품 상세 정보 로드 중 오류 발생:', error);
+            this.showError('상품을 찾을 수 없습니다.'); // 오류 발생 시 메시지 표시
         }
-        
-        this.renderAuctionDetail();
-        this.setupEventListeners();
-        this.startCountdown();
     }
 
-    async renderAuctionDetail() {
+    renderAuctionDetail() {
         const container = document.getElementById('auctionDetail');
         if (!container) return;
-        
+
         const currentPrice = getCurrentPrice(this.currentItem);
-        const timeLeft = formatTimeRemaining(this.currentItem.endDate);
+        const timeLeft = formatTimeRemaining(this.currentItem.auctionEndDate); // auctionEndDate 사용
         const user = authManager.getUser();
         const isWishlisted = user && user.wishlist && user.wishlist.includes(this.currentItem.id);
-        
+
         container.innerHTML = `
             <div class="auction-detail-container">
                 <div class="auction-detail-images">
                     <div class="main-image">
-                        <img src="${this.currentItem.images[0] || '../images/placeholder.svg'}" alt="${this.currentItem.name}" id="mainImage">
+                        <img src="${this.currentItem.imagePath ? '/images/' + this.currentItem.imagePath : '/images/placeholder.svg'}" alt="${this.currentItem.productName}" id="mainImage">
                     </div>
                     <div class="image-thumbnails">
-                        ${this.currentItem.images.map((image, index) => `
-                            <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="auctionDetailManager.changeImage('${image}', this)">
-                                <img src="${image || '../images/placeholder.svg'}" alt="${this.currentItem.name}">
+                        ${this.currentItem.imagePath ? `
+                            <div class="thumbnail active" onclick="auctionDetailManager.changeImage('/images/${this.currentItem.imagePath}', this)">
+                                <img src="/images/${this.currentItem.imagePath}" alt="${this.currentItem.productName}">
                             </div>
-                        `).join('')}
+                        ` : ''}
                     </div>
                 </div>
-                
+
                 <div class="auction-detail-info">
                     <div class="auction-detail-header">
                         <div class="auction-detail-tags">
-                            ${this.currentItem.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            <!-- 카테고리 정보가 있다면 여기에 표시 -->
+                            ${this.currentItem.categoryId ? `<span class="tag">${getCategoryNameById(this.currentItem.categoryId)}</span>` : ''}
                         </div>
-                        <h1 class="auction-detail-title">${this.currentItem.name}</h1>
+                        <h1 class="auction-detail-title">${this.currentItem.productName}</h1>
                         <div class="auction-detail-seller">
-                            <span class="seller-name">${this.currentItem.seller.name}</span>
+                            <span class="seller-name">${this.currentItem.registerUserName || '알 수 없음'}</span>
                             <div class="seller-rating">
                                 <span class="stars">★★★★★</span>
                                 <span class="rating">4.8</span>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="auction-detail-price">
                         <div class="current-price">
                             <span class="price-label">현재가</span>
@@ -75,22 +85,22 @@ class AuctionDetailManager {
                         </div>
                         <div class="original-price">
                             <span class="price-label">시작가</span>
-                            <span class="price-value">${formatPrice(this.currentItem.startPrice)}</span>
+                            <span class="price-value">${formatPrice(this.currentItem.startingPrice)}</span>
                         </div>
                     </div>
-                    
+
                     <div class="auction-detail-timer">
                         <div class="timer-label">남은 시간</div>
                         <div class="timer-value" id="countdown">
                             ${timeLeft.text}
                         </div>
                     </div>
-                    
+
                     <div class="auction-detail-actions">
                         <button class="btn btn-primary" onclick="auctionDetailManager.placeBid()">
                             입찰하기
                         </button>
-                        <button class="btn btn-outline ${isWishlisted ? 'active' : ''}" 
+                        <button class="btn btn-outline ${isWishlisted ? 'active' : ''}"
                                 onclick="auctionDetailManager.toggleWishlist()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -104,42 +114,42 @@ class AuctionDetailManager {
                             채팅
                         </button>
                     </div>
-                    
+
                     <div class="auction-detail-description">
                         <h3>상품 설명</h3>
                         <p>${this.currentItem.description || '상품 설명이 없습니다.'}</p>
                     </div>
                 </div>
             </div>
-            
+
             <div class="auction-detail-tabs">
                 <div class="tab-buttons">
                     <button class="tab-button active" onclick="auctionDetailManager.showTab('bids')">입찰 내역</button>
                     <button class="tab-button" onclick="auctionDetailManager.showTab('details')">상품 상세</button>
                     <button class="tab-button" onclick="auctionDetailManager.showTab('reviews')">판매자 리뷰</button>
                 </div>
-                
+
                 <div class="tab-content">
                     <div id="bidsTab" class="tab-panel active">
                         <div class="bid-history">
                             <h3>입찰 내역</h3>
                             <div class="bid-list" id="bidList">
-                                <div class="bid-list" id="bidList"></div>
+                                ${this.generateBidHistory()}
                             </div>
                         </div>
                     </div>
-                    
+
                     <div id="detailsTab" class="tab-panel">
                         <div class="product-details">
                             <h3>상품 상세 정보</h3>
                             <div class="detail-grid">
                                 <div class="detail-item">
                                     <span class="detail-label">카테고리</span>
-                                    <span class="detail-value">${this.currentItem.category || '기타'}</span>
+                                    <span class="detail-value">${this.currentItem.categoryId || '기타'}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">상태</span>
-                                    <span class="detail-value">${this.currentItem.condition || '새상품'}</span>
+                                    <span class="detail-value">${this.currentItem.transactionStatus || '알 수 없음'}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">배송</span>
@@ -148,7 +158,7 @@ class AuctionDetailManager {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div id="reviewsTab" class="tab-panel">
                         <div class="seller-reviews">
                             <h3>판매자 리뷰</h3>
@@ -173,19 +183,17 @@ class AuctionDetailManager {
                 </div>
             </div>
         `;
-        await this.generateBidHistory();
     }
 
     async generateBidHistory() {
         const bidListContainer = document.getElementById('bidList');
-        const productId = parseInt(this.currentItem.id.replace('item-', ''));
-
         if (!bidListContainer) return;
 
         try {
-            const response = await fetch(`/api/bids?productId=${productId}`);
-            if (!response.ok) throw new Error("입찰 내역 불러오기 실패");
-
+            const response = await fetch(`/api/bids?productId=${this.currentItem.productId}`);
+            if (!response.ok) {
+                throw new Error('입찰 내역을 불러오는 데 실패했습니다.');
+            }
             const bids = await response.json();
 
             if (bids.length === 0) {
@@ -194,37 +202,36 @@ class AuctionDetailManager {
             }
 
             bidListContainer.innerHTML = bids.map(bid => `
-            <div class="bid-item">
-                <div class="bid-info">
-                    <span class="bidder">${bid.bidUserId}</span>
-                    <span class="bid-amount">${formatPrice(bid.bidPrice)}</span>
+                <div class="bid-item">
+                    <div class="bid-info">
+                        <span class="bidder">${bid.bidUserId}</span>
+                        <span class="bid-amount">${formatPrice(bid.bidPrice)}</span>
+                    </div>
+                    <span class="bid-time">${new Date(bid.bidDate).toLocaleString('ko-KR')}</span>
                 </div>
-                <span class="bid-time">${new Date(bid.bidDate).toLocaleString('ko-KR')}</span>
-            </div>
-        `).join('');
+            `).join('');
         } catch (error) {
-            console.error('입찰 내역 불러오기 오류:', error);
+            console.error('Error fetching bid history:', error);
             bidListContainer.innerHTML = '<p>입찰 내역을 불러오는 데 실패했습니다.</p>';
         }
     }
 
-
     changeImage(imageSrc, thumbnail) {
         document.getElementById('mainImage').src = imageSrc;
-        
+
         // Update active thumbnail
         document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
         thumbnail.classList.add('active');
     }
-    
+
     showTab(tabName) {
         // Hide all tab panels
         document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
         document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-        
+
         // Show selected tab
         document.getElementById(tabName + 'Tab').classList.add('active');
-        event.target.classList.add('active');
+        // event.target.classList.add('active'); // 이 부분은 호출하는 곳에서 event 객체가 없을 수 있으므로 주석 처리 또는 수정 필요
     }
 
     async placeBid() {
@@ -232,117 +239,107 @@ class AuctionDetailManager {
             alert('로그인이 필요합니다.');
             return;
         }
-        
-        const currentPrice = getCurrentPrice(this.currentItem);
-        const minBid = currentPrice + 10000; // 최소 입찰가
-        
-        const bidAmount = prompt(`최소 입찰가: ${formatPrice(minBid)}\n입찰 금액을 입력하세요:`, minBid);
 
-        if (bidAmount && !isNaN(bidAmount) && parseInt(bidAmount) >= minBid) {
-            const user = authManager.getUser();
-            await placeBid(parseInt(this.currentItem.id.replace('item-', '')), user.userId, parseInt(bidAmount));
-            await this.generateBidHistory();
-        }
-        else if (bidAmount !== null) {
+        const currentPrice = getCurrentPrice(this.currentItem);
+        const minBid = currentPrice + this.currentItem.bidUnit; // 최소 입찰가 계산
+
+        const bidAmountStr = prompt(
+            `💰 현재가: ${formatPrice(currentPrice)}\n📈 최소 입찰가: ${formatPrice(minBid)}\n\n입찰 금액을 입력하세요:`,
+            minBid
+        );
+
+        if (bidAmountStr === null) return; // 취소 클릭 시 종료
+
+        const bidAmount = parseInt(bidAmountStr);
+        if (isNaN(bidAmount) || bidAmount < minBid) {
             alert('올바른 입찰가를 입력해주세요.');
+            return;
+        }
+
+        const bidData = {
+            productId: this.currentItem.productId,
+            bidPrice: bidAmount,
+            bidUserId: authManager.getCurrentUserId()
+            // bidUserId와 bidDate는 서버에서 설정됨
+        };
+
+        try {
+            const response = await fetch('/api/bids', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bidData),
+                credentials: 'include' // ✅ 세션 쿠키 전송
+            });
+
+            if (response.ok) {
+                alert('입찰이 완료되었습니다!');
+                this.renderAuctionDetail(); // 최신 정보 반영
+            } else if (response.status === 401) {
+                alert('로그인이 필요합니다.');
+            } else {
+                const errorText = await response.text();
+                if (errorText.includes("포인트가 부족합니다")) {
+                    alert('포인트가 부족합니다. 포인트를 충전해주세요.');
+                } else {
+                    alert('입찰 실패: ' + errorText);
+                }
+            }
+        } catch (error) {
+            console.error('입찰 중 오류 발생:', error);
+            alert('입찰 처리 중 오류가 발생했습니다.');
         }
     }
-    
+
+
     toggleWishlist() {
         if (!authManager.isLoggedIn()) {
             alert('로그인이 필요합니다.');
             return;
         }
-        
+
         const wasWishlisted = authManager.toggleWishlist(this.currentItem.id);
         const button = event.target.closest('button');
-        
+
         if (wasWishlisted) {
             button.classList.add('active');
         } else {
             button.classList.remove('active');
         }
     }
-    
+
     openChat() {
         if (!authManager.isLoggedIn()) {
             alert('로그인이 필요합니다.');
             return;
         }
-        
-        const user = authManager.getUser();
-        if (!user) {
-            alert('사용자 정보를 가져올 수 없습니다.');
-            return;
-        }
-        
-        // 판매자와 채팅 시작
-        const sellerId = this.currentItem.sellerId;
-        const productId = this.currentItem.id.replace('item-', ''); // item-123 -> 123
-        
-        // 채팅방 생성 또는 조회
-        this.createOrGetChatRoom(user.userId, sellerId, productId);
+
+        alert('채팅 기능은 준비 중입니다.');
     }
-    
-    async createOrGetChatRoom(buyerId, sellerId, productId) {
-        try {
-            const response = await fetch('/api/chat/conversations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    senderId: buyerId,
-                    receiverId: sellerId,
-                    productId: parseInt(productId)
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to create chat room');
-            }
-            
-            const chatRoom = await response.json();
-            
-            // 채팅 모달 열기
-            if (window.chatManager) {
-                window.chatManager.openChatModal();
-                // 특정 채팅방으로 이동
-                setTimeout(() => {
-                    window.chatManager.openChat(chatRoom.chatId);
-                }, 100);
-            } else {
-                alert('채팅 매니저를 찾을 수 없습니다.');
-            }
-            
-        } catch (error) {
-            console.error('Error creating chat room:', error);
-            alert('채팅방을 생성하는데 실패했습니다.');
-        }
-    }
-    
+
     startCountdown() {
         const countdownElement = document.getElementById('countdown');
         if (!countdownElement) return;
-        
+
         const updateCountdown = () => {
-            const timeLeft = formatTimeRemaining(this.currentItem.endDate);
+            const timeLeft = formatTimeRemaining(this.currentItem.auctionEndDate); // auctionEndDate 사용
             countdownElement.textContent = timeLeft.text;
-            
+
             if (timeLeft.isOver) {
                 countdownElement.textContent = '경매 종료';
                 countdownElement.style.color = '#dc2626';
             }
         };
-        
+
         updateCountdown();
         setInterval(updateCountdown, 1000);
     }
-    
+
     setupEventListeners() {
         // Add any additional event listeners here
     }
-    
+
     showError(message) {
         const container = document.getElementById('auctionDetail');
         if (container) {

@@ -19,4 +19,8 @@ public class ProductService {
     public List<Product> selectAll() {
         return productRepository.selectAll();
     }
+
+    public Product select(int productId) {
+        return productRepository.select(productId);
+    }
 }
