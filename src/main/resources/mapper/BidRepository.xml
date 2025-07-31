@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.repository.BidRepository">
+
+    <!-- Bid DTO 매핑 : 컬럼 → 프로퍼티 -->
+    <resultMap id="BidMap" type="edu.sm.dto.Bid">
+        <id     property="productId"  column="product_id"/>
+        <result property="bidUserId"  column="user_id"/>
+        <result property="bidPrice"   column="bid_price"/>
+        <result property="bidDate"    column="bid_date"/>
+    </resultMap>
+
+    <!-- 내가 낸 최고가만 조회 -->
+    <select id="findByUserId" parameterType="string" resultMap="BidMap">
+        SELECT
+            product_id,
+            user_id,
+            MAX(bid_price) AS bid_price,
+            MAX(bid_date)  AS bid_date
+        FROM Bid
+        WHERE user_id = #{userId}
+        GROUP BY product_id
+        ORDER BY bid_date DESC
+    </select>
+</mapper>

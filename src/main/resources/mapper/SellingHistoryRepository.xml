@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.repository.SellingHistoryRepository">
+
+    <resultMap id="ProductMap" type="edu.sm.dto.Product">
+        <id     property="productId"        column="product_id"/>
+        <result property="productName"      column="product_name"/>
+        <result property="imagePath"        column="image_path"/>
+        <result property="transactionStatus" column="transaction_status"/>
+        <result property="auctionEndDate"   column="auction_end_date"/>
+        <result property="startingPrice"    column="starting_price"/>
+        <result property="bidUnit"          column="bid_unit"/>
+        <result property="registerUserId"   column="user_id"/>
+    </resultMap>
+
+    <!-- 내가 올린 상품 + 최고 입찰가 (없으면 starting_price) -->
+    <select id="findBySellerId" parameterType="string" resultMap="ProductMap">
+        SELECT
+            p.*,
+            COALESCE((
+                         SELECT MAX(bid_price) FROM Bid
+                         WHERE product_id = p.product_id
+                     ), p.starting_price) AS highest_price
+        FROM Product p
+        WHERE p.user_id = #{sellerId}
+        ORDER BY p.auction_end_date DESC
+    </select>
+
+</mapper>
