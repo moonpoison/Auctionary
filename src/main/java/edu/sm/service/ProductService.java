@@ -1,0 +1,66 @@
+
+package edu.sm.service;
+
+import edu.sm.dto.Product;
+import edu.sm.repository.BidRepository;
+import edu.sm.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import edu.sm.exception.ProductNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+
+@Service
+public class ProductService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private BidRepository bidRepository;
+
+    public Product createProduct(Product product) {
+        try {
+            productRepository.insert(product);
+            return product;
+        } catch (Exception e) {
+            logger.error("상품 등록 실패: ", e);
+            throw new RuntimeException("상품 등록 실패: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Product> getAllProducts() {
+        try {
+            return productRepository.selectAll();
+        } catch (Exception e) {
+            logger.error("상품 조회 실패: ", e);
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    public Product getProductById(int productId) {
+        try {
+            Product product = productRepository.select(productId);
+            if (product == null) {
+                throw new ProductNotFoundException("상품을 찾을 수 없습니다: " + productId);
+            }
+
+            // ✅ 최고 입찰가 조회 후 반영
+            Integer highestBid = bidRepository.findHighestBidPriceByProductId(productId);
+            if (highestBid != null) {
+                product.setHighestBid(highestBid); // DTO에 해당 필드가 있어야 함
+            }
+
+            return product;
+        } catch (Exception e) {
+            logger.error("상품 조회 실패: ", e);
+            throw new RuntimeException("상품 조회 실패: " + e.getMessage(), e);
+        }
+    }
+}

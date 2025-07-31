@@ -32,7 +32,7 @@ public class PointHistoryService {
     }
 
     public int select(String userId) throws Exception {
-        Integer point = pointHistoryRepository.select(userId);
-        return point != null ? point : 0; // null인 경우 기본값 0 반환
+        Point_History point = pointHistoryRepository.Select(userId);  // ✅ 변수명 수정
+        return point != null ? point.getFinalPoint() : 0;             // ✅ 포인트 필드 추출
     }
 }

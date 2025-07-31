@@ -19,7 +19,6 @@ public class User {
     private String phoneNumber;
     private String email;
     private String role;
-    private Integer points; // 포인트 필드 추가
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

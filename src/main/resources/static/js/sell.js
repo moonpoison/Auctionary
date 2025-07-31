@@ -1,4 +1,19 @@
 // Sell Page Logic
+const CATEGORY_LIST = [
+    { id: 1, name: "전자제품", parentId: null },
+    { id: 2, name: "패션의류", parentId: null },
+    { id: 3, name: "도서/음반", parentId: null },
+    { id: 4, name: "가구/인테리어", parentId: null },
+    { id: 5, name: "노트북/PC", parentId: 1 },
+    { id: 6, name: "휴대폰", parentId: 1 },
+    { id: 7, name: "남성 의류", parentId: 2 },
+    { id: 8, name: "여성 의류", parentId: 2 },
+    { id: 9, name: "소설", parentId: 3 },
+    { id: 10, name: "로맨스", parentId: 3 },
+    { id: 11, name: "침대", parentId: 4 },
+    { id: 12, name: "소파", parentId: 4 }
+];
+
 class SellManager {
     constructor() {
         this.uploadedImages = [];
@@ -9,6 +24,7 @@ class SellManager {
         this.checkAuth();
         this.setupEventListeners();
         this.setDefaultDateTime();
+        this.initCategoryDropdowns(); // 추가
     }
     
     // Check if user is logged in
@@ -67,25 +83,65 @@ class SellManager {
             });
         }
     }
-    
+
+    // 이미지 파일을 서버에 업로드하고 저장된 파일명을 반환
+    async uploadImageToServer(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/upload/image', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include' // ✅ 꼭 필요!
+            });
+
+            if (response.ok) {
+                const filename = await response.text();
+                console.log('✅ 이미지 서버 업로드 성공:', filename);
+                return filename;
+            } else {
+                const errorText = await response.text();
+                console.error('❌ 이미지 업로드 실패:', errorText);
+                alert('이미지 업로드 실패: ' + errorText);
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ 이미지 업로드 중 오류:', error);
+            alert('네트워크 오류로 이미지 업로드에 실패했습니다.');
+            return null;
+        }
+    }
+
+
     // Handle file selection
-    handleFileSelection(files) {
-        Array.from(files).forEach(file => {
+    // 파일 선택 시 이미지 미리보기 및 서버 업로드
+    async handleFileSelection(files) {
+        for (let file of files) {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
+
+                reader.onload = async (e) => {
+                    // 이미지 서버 업로드
+                    const uploadedFilename = await this.uploadImageToServer(file);
+                    if (!uploadedFilename) return;
+
+                    // 업로드된 서버 이미지 정보를 저장
                     this.uploadedImages.push({
                         id: Date.now() + Math.random(),
                         src: e.target.result,
-                        name: file.name
+                        name: uploadedFilename  // 서버 파일명 저장
                     });
+
                     this.updateImagePreview();
                 };
+
                 reader.readAsDataURL(file);
             }
-        });
+        }
     }
-    
+
+
     // Update image preview
     updateImagePreview() {
         const imagePreview = document.getElementById('imagePreview');
@@ -116,15 +172,10 @@ class SellManager {
         const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
         
         const endDate = document.getElementById('endDate');
-        const endTime = document.getElementById('endTime');
         
         if (endDate) {
             const dateString = tomorrow.toISOString().slice(0, 16);
             endDate.value = dateString;
-        }
-        
-        if (endTime) {
-            endTime.value = '23:59';
         }
     }
     
@@ -256,54 +307,58 @@ class SellManager {
     handleFormSubmission(e) {
         const formData = new FormData(e.target);
         const data = this.getFormData(formData);
-        
+
         if (!this.validatePreviewData(data)) {
             return;
         }
-        
+
         if (this.uploadedImages.length === 0) {
             alert('최소 1개의 이미지를 업로드해주세요.');
             return;
         }
-        
-        // Create new auction item
+
         const newItem = this.createAuctionItem(data);
-        
-        // Add to mock data
-        MOCK_AUCTION_ITEMS.push(newItem);
-        
-        alert('상품이 성공적으로 등록되었습니다!');
-        window.location.href = '../index';
+
+        fetch('/api/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItem),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            alert('상품이 성공적으로 등록되었습니다!');
+            window.location.href = '../index';
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('상품 등록에 실패했습니다.');
+        });
     }
-    
+
     // Create auction item
     createAuctionItem(data) {
         const user = authManager.getUser();
-        const endDate = new Date(data.endDate);
-        const tags = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-        
+        const auctionEndDate = data.endDate ? new Date(data.endDate) : null;
+
         return {
-            id: `item-${Date.now()}`,
-            name: data.name,
+            userId: user.id,
+            productName: data.name,
             description: data.description,
-            images: this.uploadedImages.map(img => img.src),
-            tags: tags,
-            sellerId: user.id,
-            seller: {
-                name: user.name,
-                avatar: user.avatar,
-                rating: user.reviews.length > 0 ? 
-                    user.reviews.reduce((sum, review) => sum + review.rating, 0) / user.reviews.length : 0,
-                reviews: user.reviews.length
-            },
-            category: data.category,
-            endDate: endDate,
-            startPrice: parseInt(data.startPrice),
-            buyNowPrice: data.buyNowPrice ? parseInt(data.buyNowPrice) : undefined,
-            bidIncrement: parseInt(data.bidIncrement),
-            bids: [],
-            status: "active",
-            wishlistedCount: 0
+            imagePath: this.uploadedImages.length > 0 ? this.uploadedImages[0].name : null,
+            categoryId: parseInt(data.category),
+            auctionStartDate: new Date(),
+            auctionEndDate: auctionEndDate,
+            startingPrice: parseInt(data.startPrice),
+            bidUnit: parseInt(data.bidIncrement),
+            transactionStatus: 'AUCTIONING'
         };
     }
     
@@ -319,6 +374,34 @@ class SellManager {
             default:
                 return '미정';
         }
+    }
+
+    initCategoryDropdowns() {
+        const mainSelect = document.getElementById('mainCategory');
+        const subSelect = document.getElementById('subCategory');
+
+        // 대분류만 먼저 필터링
+        const mainCategories = CATEGORY_LIST.filter(cat => cat.parentId === null);
+        mainCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = cat.name;
+            mainSelect.appendChild(option);
+        });
+
+        // 대분류 선택 시 중분류 동적 변경
+        mainSelect.addEventListener('change', () => {
+            const selectedMainId = parseInt(mainSelect.value);
+            subSelect.innerHTML = `<option value="">중분류를 선택하세요</option>`; // 초기화
+
+            const subCategories = CATEGORY_LIST.filter(cat => cat.parentId === selectedMainId);
+            subCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                subSelect.appendChild(option);
+            });
+        });
     }
 }
 

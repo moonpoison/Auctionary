@@ -2,18 +2,33 @@
 
 // Format time remaining for auction
 function formatTimeRemaining(endDate) {
+    const end = new Date(endDate); // endDate를 Date 객체로 변환 시도
     const now = new Date();
-    const timeLeft = endDate.getTime() - now.getTime();
-    
+
+    // end가 유효한 Date 객체가 아니면 (Invalid Date)
+    if (isNaN(end.getTime())) {
+        console.warn('Invalid endDate provided to formatTimeRemaining:', endDate);
+        return {
+            text: '남은 시간 정보 없음',
+            isOver: true,
+            days: 0,
+            hours: 0,
+            minutes: 0,
+            seconds: 0
+        };
+    }
+
+    const timeLeft = end.getTime() - now.getTime();
+
     if (timeLeft <= 0) {
         return { isOver: true, text: "경매 종료" };
     }
-    
+
     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-    
+
     if (days > 0) {
         return { isOver: false, text: `${days}일 남음`, days, hours, minutes, seconds };
     } else if (hours > 0) {
@@ -32,10 +47,7 @@ function formatPrice(price) {
 
 // Get current price of auction item
 function getCurrentPrice(item) {
-    if (item.bids.length === 0) {
-        return item.startPrice;
-    }
-    return Math.max(...item.bids.map(bid => bid.amount));
+    return item.highestBid ?? item.startingPrice;
 }
 
 // Check if user has wishlisted an item
