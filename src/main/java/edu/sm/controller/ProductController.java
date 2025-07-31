@@ -95,8 +95,7 @@ public class ProductController {
             image.transferTo(destFile);
 
             // Return the web-accessible path
-            String imageUrl = "/images/" + uniqueFilename;
-            return ResponseEntity.ok().body(imageUrl);
+            return ResponseEntity.ok().body(uniqueFilename);
 
         } catch (IOException e) {
             // Log the exception
