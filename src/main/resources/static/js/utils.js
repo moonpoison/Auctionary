@@ -1,7 +1,26 @@
 // Utility Functions
 
+const CATEGORY_LIST = [
+    { id: 1, name: "전자제품", parentId: null },
+    { id: 2, name: "패션의류", parentId: null },
+    { id: 3, name: "도서/음반", parentId: null },
+    { id: 4, name: "가구/인테리어", parentId: null },
+    { id: 5, name: "노트북/PC", parentId: 1 },
+    { id: 6, name: "휴대폰", parentId: 1 },
+    { id: 7, name: "남성 의류", parentId: 2 },
+    { id: 8, name: "여성 의류", parentId: 2 },
+    { id: 9, name: "소설", parentId: 3 },
+    { id: 10, name: "침대/소파", parentId: 4 }
+];
+
+function getCategoryNameById(categoryId) {
+    const category = CATEGORY_LIST.find(cat => cat.id === parseInt(categoryId, 10));
+    return category ? category.name : '기타';
+}
+
 // Format time remaining for auction
-function formatTimeRemaining(endDate) {
+function formatTimeRemaining(auctionEndDateStr) {
+    const endDate = new Date(auctionEndDateStr);
     const now = new Date();
     const timeLeft = endDate.getTime() - now.getTime();
     
@@ -32,18 +51,15 @@ function formatPrice(price) {
 
 // Get current price of auction item
 function getCurrentPrice(item) {
-    if (item.bids.length === 0) {
-        return item.startPrice;
-    }
-    return Math.max(...item.bids.map(bid => bid.amount));
+    return Math.max(item.startingPrice, item.highestBid || 0);
 }
 
-// Check if user has wishlisted an item
+// Check if user has wishlisted an item (will be removed or adapted later if wishlist is implemented differently)
 function isWishlisted(user, itemId) {
     return user && user.wishlist && user.wishlist.includes(itemId);
 }
 
-// Toggle wishlist for an item
+// Toggle wishlist for an item (will be removed or adapted later)
 function toggleWishlist(user, itemId) {
     if (!user) {
         alert("로그인이 필요합니다.");
@@ -66,33 +82,30 @@ function toggleWishlist(user, itemId) {
 
 // Sort auction items
 function sortAuctionItems(items, sortType) {
-    const activeItems = items.filter(item => item.status === "active");
+    // Filter by transactionStatus. Assuming "selling" is the active status.
+    // const activeItems = items.filter(item => item.transactionStatus === "selling"); // Temporarily removed for debugging
+    const activeItems = items; // Use all items for now
     
     switch (sortType) {
         case "closing":
-            return [...activeItems].sort((a, b) => a.endDate.getTime() - b.endDate.getTime());
-        case "popular":
-            return [...activeItems].sort((a, b) => b.wishlistedCount - a.wishlistedCount);
+            // Sort by auctionEndDate
+            return [...activeItems].sort((a, b) => new Date(a.auctionEndDate).getTime() - new Date(b.auctionEndDate).getTime());
+        // "popular" sort removed as wishlistedCount is not in Product DTO
         case "newest":
-            return [...activeItems].sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
+            // Sort by auctionStartDate (assuming it represents creation date)
+            return [...activeItems].sort((a, b) => new Date(b.auctionStartDate).getTime() - new Date(a.auctionStartDate).getTime());
         case "highPrice":
-            return [...activeItems].sort((a, b) => {
-                const priceA = getCurrentPrice(a);
-                const priceB = getCurrentPrice(b);
-                return priceB - priceA;
-            });
+            // Sort by startingPrice
+            return [...activeItems].sort((a, b) => b.startingPrice - a.startingPrice);
         case "lowPrice":
-            return [...activeItems].sort((a, b) => {
-                const priceA = getCurrentPrice(a);
-                const priceB = getCurrentPrice(b);
-                return priceA - priceB;
-            });
+            // Sort by startingPrice
+            return [...activeItems].sort((a, b) => a.startingPrice - b.startingPrice);
         default:
             return activeItems;
     }
 }
 
-// Create countdown timer
+// Create countdown timer (will be updated in auction-card.js)
 function createCountdownTimer(element, endDate, onUpdate) {
     function updateTimer() {
         const timeLeft = formatTimeRemaining(endDate);
