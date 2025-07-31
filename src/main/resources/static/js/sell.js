@@ -1,16 +1,31 @@
 // Sell Page Logic
+const CATEGORY_LIST = [
+    { id: 1, name: "전자제품", parentId: null },
+    { id: 2, name: "패션의류", parentId: null },
+    { id: 3, name: "도서/음반", parentId: null },
+    { id: 4, name: "가구/인테리어", parentId: null },
+    { id: 5, name: "노트북/PC", parentId: 1 },
+    { id: 6, name: "휴대폰", parentId: 1 },
+    { id: 7, name: "남성 의류", parentId: 2 },
+    { id: 8, name: "여성 의류", parentId: 2 },
+    { id: 9, name: "소설", parentId: 3 },
+    { id: 10, name: "로맨스", parentId: 3 },
+    { id: 11, name: "침대", parentId: 4 },
+    { id: 12, name: "소파", parentId: 4 }
+];
+
 class SellManager {
     constructor() {
         this.uploadedImages = [];
         this.init();
     }
-    
+
     init() {
         this.checkAuth();
         this.setupEventListeners();
         this.setDefaultDateTime();
     }
-    
+
     // Check if user is logged in
     checkAuth() {
         if (!authManager.isLoggedIn()) {
@@ -18,7 +33,7 @@ class SellManager {
             return;
         }
     }
-    
+
     // Setup event listeners
     setupEventListeners() {
         // Form submission
@@ -29,9 +44,49 @@ class SellManager {
                 this.handleFormSubmission(e);
             });
         }
-        
+
         // Image upload
         this.setupImageUpload();
+        this.setupCategorySelectors();
+    }
+
+    // Setup category selectors
+    setupCategorySelectors() {
+        const mainCategorySelect = document.getElementById('mainCategory');
+        const subCategorySelect = document.getElementById('subCategory');
+
+        // Populate main categories
+        const mainCategories = CATEGORY_LIST.filter(c => c.parentId === null);
+        mainCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            mainCategorySelect.appendChild(option);
+        });
+
+        // Handle main category change
+        mainCategorySelect.addEventListener('change', () => {
+            const selectedMainCategoryId = parseInt(mainCategorySelect.value);
+            
+            // Clear sub-category options
+            subCategorySelect.innerHTML = '<option value="">중분류를 선택하세요</option>';
+
+            if (selectedMainCategoryId) {
+                const subCategories = CATEGORY_LIST.filter(c => c.parentId === selectedMainCategoryId);
+                subCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id; // Use ID for the value
+                    option.textContent = category.name;
+                    subCategorySelect.appendChild(option);
+                });
+                subCategorySelect.disabled = false;
+            } else {
+                subCategorySelect.disabled = true;
+            }
+        });
+
+        // Initial state
+        subCategorySelect.disabled = true;
     }
     
     // Setup image upload functionality
@@ -182,7 +237,8 @@ class SellManager {
         const previewContent = document.getElementById('previewContent');
         
         if (!modal || !previewContent) return;
-        
+
+        const categoryName = CATEGORY_LIST.find(c => c.id === parseInt(data.category))?.name || data.category;
         const tags = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
         const endDate = new Date(data.endDate);
         
@@ -200,7 +256,7 @@ class SellManager {
                     <div class="preview-item-details">
                         <div class="preview-item-detail">
                             <span class="label">카테고리</span>
-                            <span class="value">${data.category}</span>
+                            <span class="value">${categoryName}</span>
                         </div>
                         <div class="preview-item-detail">
                             <span class="label">시작가</span>
@@ -253,57 +309,66 @@ class SellManager {
     }
     
     // Handle form submission
-    handleFormSubmission(e) {
+    async handleFormSubmission(e) {
+        e.preventDefault();
         const formData = new FormData(e.target);
         const data = this.getFormData(formData);
-        
+
         if (!this.validatePreviewData(data)) {
             return;
         }
-        
+
         if (this.uploadedImages.length === 0) {
             alert('최소 1개의 이미지를 업로드해주세요.');
             return;
         }
-        
-        // Create new auction item
-        const newItem = this.createAuctionItem(data);
-        
-        // Add to mock data
-        MOCK_AUCTION_ITEMS.push(newItem);
-        
-        alert('상품이 성공적으로 등록되었습니다!');
-        window.location.href = '../index';
+
+        try {
+            // 1. Upload image
+            const imageFormData = new FormData();
+            // Convert data URL to blob for upload
+            const imageFile = await (await fetch(this.uploadedImages[0].src)).blob();
+            imageFormData.append('image', imageFile, this.uploadedImages[0].name);
+
+            const uploadResponse = await fetch("/api/products/upload-image", {
+                method: "POST",
+                body: imageFormData
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('이미지 업로드에 실패했습니다.');
+            }
+
+            const imagePath = await uploadResponse.text();
+
+            // 2. Create auction item with the returned image path
+            const newItem = this.createAuctionItem(data, imagePath);
+
+            // 3. Register the product
+            await registerProduct(newItem);
+
+        } catch (error) {
+            console.error("상품 등록 중 오류 발생:", error);
+            alert(error.message || "상품 등록에 실패했습니다.");
+        }
     }
-    
+
     // Create auction item
-    createAuctionItem(data) {
-        const user = authManager.getUser();
+    createAuctionItem(data, imagePath) {
         const endDate = new Date(data.endDate);
-        const tags = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-        
+        const user = authManager.getUser();
+
         return {
-            id: `item-${Date.now()}`,
-            name: data.name,
+            productName: data.name,
             description: data.description,
-            images: this.uploadedImages.map(img => img.src),
-            tags: tags,
-            sellerId: user.id,
-            seller: {
-                name: user.name,
-                avatar: user.avatar,
-                rating: user.reviews.length > 0 ? 
-                    user.reviews.reduce((sum, review) => sum + review.rating, 0) / user.reviews.length : 0,
-                reviews: user.reviews.length
-            },
-            category: data.category,
-            endDate: endDate,
-            startPrice: parseInt(data.startPrice),
-            buyNowPrice: data.buyNowPrice ? parseInt(data.buyNowPrice) : undefined,
-            bidIncrement: parseInt(data.bidIncrement),
-            bids: [],
-            status: "active",
-            wishlistedCount: 0
+            imagePath: imagePath, // Set the image path from the server response
+            categoryId: data.category,
+            auctionStartDate: new Date().toISOString(),
+            auctionEndDate: endDate.toISOString(),
+            startingPrice: parseInt(data.startPrice),
+            bidUnit: parseInt(data.bidIncrement),
+            registerUserId: user ? user.userId : null,
+            transactionStatus: 'AUCTIONING'
         };
     }
     
@@ -325,4 +390,18 @@ class SellManager {
 // Initialize sell manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.sellManager = new SellManager();
-}); 
+});
+
+async function registerProduct(product) {
+    const response = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product)
+    });
+    if (response.ok) {
+        alert("상품이 등록되었습니다");
+        window.location.href = '../index';
+    } else {
+        alert("상품 등록에 실패했습니다.");
+    }
+}

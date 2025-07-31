@@ -9,4 +9,7 @@ import java.util.List;
 @Mapper
 public interface ProductRepository {
     List<Product> findByIds(List<String> ids);
+    void insertProduct(Product product);
+
+    List<Product> selectAll();
 }

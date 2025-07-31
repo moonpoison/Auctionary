@@ -1,14 +1,31 @@
 // Main Application Logic
 class AuctionApp {
     constructor() {
+        this.products = []; // 상품 데이터를 저장할 배열
         this.currentSort = 'closing';
         this.init();
     }
     
     async init() {
+        await this.fetchProducts(); // 상품 목록을 먼저 가져옴
         this.setupEventListeners();
         this.renderAuctionGrid();
         this.startTimer();
+    }
+
+    // Fetch products from the server
+    async fetchProducts() {
+        try {
+            const response = await fetch('/api/products');
+            if (!response.ok) {
+                throw new Error('상품 목록을 불러오는 데 실패했습니다.');
+            }
+            this.products = await response.json();
+        } catch (error) {
+            console.error(error);
+            // 에러 발생 시 목 데이터를 사용하거나 사용자에게 알림
+            this.products = []; 
+        }
     }
     
     // Setup event listeners
@@ -75,7 +92,8 @@ class AuctionApp {
         const grid = document.getElementById('auctionGrid');
         if (!grid) return;
         
-        const sortedItems = sortAuctionItems(MOCK_AUCTION_ITEMS, this.currentSort);
+        // 서버에서 가져온 데이터를 정렬하여 사용
+        const sortedItems = sortAuctionItems(this.products, this.currentSort);
         auctionCardManager.renderCards(sortedItems, grid);
     }
     
@@ -86,10 +104,10 @@ class AuctionApp {
             return;
         }
         
-        const filteredItems = MOCK_AUCTION_ITEMS.filter(item => 
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase()) ||
-            item.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+        const filteredItems = this.products.filter(item => 
+            item.productName.toLowerCase().includes(query.toLowerCase()) ||
+            (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
+            // item.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())) // tags 필드가 없으므로 주석 처리
         );
         
         const grid = document.getElementById('auctionGrid');

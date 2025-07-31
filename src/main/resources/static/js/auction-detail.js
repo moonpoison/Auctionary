@@ -28,8 +28,8 @@ class AuctionDetailManager {
         this.setupEventListeners();
         this.startCountdown();
     }
-    
-    renderAuctionDetail() {
+
+    async renderAuctionDetail() {
         const container = document.getElementById('auctionDetail');
         if (!container) return;
         
@@ -124,7 +124,7 @@ class AuctionDetailManager {
                         <div class="bid-history">
                             <h3>입찰 내역</h3>
                             <div class="bid-list" id="bidList">
-                                ${this.generateBidHistory()}
+                                <div class="bid-list" id="bidList"></div>
                             </div>
                         </div>
                     </div>
@@ -173,28 +173,42 @@ class AuctionDetailManager {
                 </div>
             </div>
         `;
+        await this.generateBidHistory();
     }
-    
-    generateBidHistory() {
-        // Generate mock bid history
-        const bids = [
-            { bidder: 'AuctionHero', amount: 850000, time: '2024-01-15 14:30' },
-            { bidder: 'V-Tech', amount: 820000, time: '2024-01-15 14:25' },
-            { bidder: 'TimeMaster', amount: 800000, time: '2024-01-15 14:20' },
-            { bidder: 'Collector', amount: 780000, time: '2024-01-15 14:15' }
-        ];
-        
-        return bids.map(bid => `
+
+    async generateBidHistory() {
+        const bidListContainer = document.getElementById('bidList');
+        const productId = parseInt(this.currentItem.id.replace('item-', ''));
+
+        if (!bidListContainer) return;
+
+        try {
+            const response = await fetch(`/api/bids?productId=${productId}`);
+            if (!response.ok) throw new Error("입찰 내역 불러오기 실패");
+
+            const bids = await response.json();
+
+            if (bids.length === 0) {
+                bidListContainer.innerHTML = '<p>입찰 내역이 없습니다.</p>';
+                return;
+            }
+
+            bidListContainer.innerHTML = bids.map(bid => `
             <div class="bid-item">
                 <div class="bid-info">
-                    <span class="bidder">${bid.bidder}</span>
-                    <span class="bid-amount">${formatPrice(bid.amount)}</span>
+                    <span class="bidder">${bid.bidUserId}</span>
+                    <span class="bid-amount">${formatPrice(bid.bidPrice)}</span>
                 </div>
-                <span class="bid-time">${bid.time}</span>
+                <span class="bid-time">${new Date(bid.bidDate).toLocaleString('ko-KR')}</span>
             </div>
         `).join('');
+        } catch (error) {
+            console.error('입찰 내역 불러오기 오류:', error);
+            bidListContainer.innerHTML = '<p>입찰 내역을 불러오는 데 실패했습니다.</p>';
+        }
     }
-    
+
+
     changeImage(imageSrc, thumbnail) {
         document.getElementById('mainImage').src = imageSrc;
         
@@ -212,8 +226,8 @@ class AuctionDetailManager {
         document.getElementById(tabName + 'Tab').classList.add('active');
         event.target.classList.add('active');
     }
-    
-    placeBid() {
+
+    async placeBid() {
         if (!authManager.isLoggedIn()) {
             alert('로그인이 필요합니다.');
             return;
@@ -223,12 +237,13 @@ class AuctionDetailManager {
         const minBid = currentPrice + 10000; // 최소 입찰가
         
         const bidAmount = prompt(`최소 입찰가: ${formatPrice(minBid)}\n입찰 금액을 입력하세요:`, minBid);
-        
+
         if (bidAmount && !isNaN(bidAmount) && parseInt(bidAmount) >= minBid) {
-            alert('입찰이 완료되었습니다!');
-            // Here you would typically update the auction item with the new bid
-            this.renderAuctionDetail(); // Refresh the display
-        } else if (bidAmount !== null) {
+            const user = authManager.getUser();
+            await placeBid(parseInt(this.currentItem.id.replace('item-', '')), user.userId, parseInt(bidAmount));
+            await this.generateBidHistory();
+        }
+        else if (bidAmount !== null) {
             alert('올바른 입찰가를 입력해주세요.');
         }
     }

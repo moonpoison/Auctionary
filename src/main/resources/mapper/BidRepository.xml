@@ -24,4 +24,19 @@
         GROUP BY product_id
         ORDER BY bid_date DESC
     </select>
+
+    <!-- ✅ bidMapper.xml 내용 병합 -->
+    <insert id="insertBid" parameterType="edu.sm.dto.Bid">
+        INSERT INTO bid
+            (bid_user_id, product_id, bid_price, bid_date)
+        VALUES
+            (#{bidUserId}, #{productId}, #{bidPrice}, #{bidDate})
+    </insert>
+
+    <select id="selectBidsByProductId" parameterType="int" resultType="edu.sm.dto.Bid">
+        SELECT bid_user_id, product_id, bid_price, bid_date
+        FROM bid
+        WHERE product_id = #{productId}
+        ORDER BY bid_date DESC
+    </select>
 </mapper>
