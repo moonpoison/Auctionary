@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.repository.ProductRepository">
+
+    <resultMap id="ProductMap" type="edu.sm.dto.Product">
+        <id     property="productId"        column="product_id"/>
+        <result property="productName"      column="product_name"/>
+        <result property="imagePath"        column="image_path"/>
+        <result property="transactionStatus" column="transaction_status"/>
+        <result property="auctionEndDate"   column="auction_end_date"/>
+        <result property="registerUserId"   column="user_id"/>
+    </resultMap>
+
+    <!-- 문자열 ID 리스트로 조회 (DTO는 String) -->
+    <select id="findByIds" parameterType="java.util.List" resultMap="ProductMap">
+        SELECT
+        product_id,
+        product_name,
+        image_path,
+        transaction_status,
+        auction_end_date,
+        user_id
+        FROM Product
+        WHERE product_id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>
