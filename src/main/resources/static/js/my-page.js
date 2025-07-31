@@ -1,321 +1,349 @@
-// My Page Logic
+/**
+ * my-page.js  (최신 통합본)
+ *  - 탭 UI
+ *  - 개요 : 최근 활동 + 포인트 내역(페이지네이션)
+ *  - 입찰 / 판매 / 구매 / 찜 / 리뷰
+ *  - fetch URL : /api/my-page/*
+ */
+
+document.addEventListener('DOMContentLoaded', () => new MyPage());
+
+/* ───────────── 전역 util ───────────── */
+const $ = (sel) => document.querySelector(sel);
+function formatPrice(n) { return Number(n).toLocaleString('ko-KR'); }
+
+/* ───────────── MyPage 클래스 ───────────── */
 class MyPage {
     constructor() {
         this.currentTab = 'overview';
+        this.pointsPage = 0;
         this.init();
     }
-    
+
+    /* ---------- 초기화 ---------- */
     init() {
         this.checkAuth();
         this.setupEventListeners();
         this.loadUserProfile();
         this.loadTabContent();
     }
-    
-    // Check if user is logged in
+
     checkAuth() {
-        if (!authManager.isLoggedIn()) {
-            window.location.href = 'login';
-            return;
-        }
+        if (!authManager.isLoggedIn()) window.location.href = 'login';
     }
-    
-    // Setup event listeners
     setupEventListeners() {
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const tabName = e.target.dataset.tab;
-                this.switchTab(tabName);
-            });
-        });
+        document.querySelectorAll('.tab-btn').forEach(btn =>
+            btn.addEventListener('click', e =>
+                this.switchTab(e.target.dataset.tab)));
     }
-    
-    // Switch tab
-    switchTab(tabName) {
-        this.currentTab = tabName;
-        
-        // Update active tab button
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-        
-        // Show active tab content
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.remove('active');
-        });
-        document.getElementById(tabName).classList.add('active');
-        
-        // Load tab content
+    switchTab(tab) {
+        this.currentTab = tab;
+        document.querySelectorAll('.tab-btn')
+            .forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        document.querySelectorAll('.tab-pane')
+            .forEach(p => p.classList.toggle('active', p.id === tab));
         this.loadTabContent();
     }
-    
-    // Load user profile
     loadUserProfile() {
-        const user = authManager.getUser();
-        if (!user) return;
-        
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userPoints').textContent = user.points.toLocaleString();
-        document.getElementById('wishlistCount').textContent = user.wishlist ? user.wishlist.length : 0;
+        const u = authManager.getUser?.();
+        if (u) {
+            $('#userName').textContent  = u.name;
+            $('#userEmail').textContent = u.email;
+        }
+
+        fetch('/api/my-page/point-history?page=0&size=1')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(d => {
+                const latest = d.content?.[0]?.finalPoint ?? u?.points ?? 0;
+                $('#userPoints').textContent = formatPrice(latest);
+
+                /* ★ 헤더 숫자 동기화 : "1,000 P" 패턴을 가진 a/span 자동 탐색 */
+                const newText = formatPrice(latest) + ' P';
+                // util‑links 영역이나 nav 안의 모든 a/span을 대상으로
+                document.querySelectorAll('header a, header span').forEach(el => {
+                    const txt = el.textContent.trim();
+                    if (/^[\d,]+\s?P$/.test(txt)) {
+                        // 숫자+P 형태인 첫 번째 요소를 찾아 교체
+                        el.textContent = newText;
+                    }
+                });
+            })
+            .catch(() => console.warn('point fetch fail'));
+
+        fetch('/api/my-page/wishlist')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(rows => $('#wishlistCount').textContent = rows.length)
+            .catch(() => console.warn('wishlist fetch fail'));
     }
-    
-    // Load tab content
+
+    /* ---------- 탭 로딩 ---------- */
     loadTabContent() {
         switch (this.currentTab) {
-            case 'overview':
-                this.loadOverview();
-                break;
-            case 'bidding':
-                this.loadBidding();
-                break;
-            case 'selling':
-                this.loadSelling();
-                break;
-            case 'purchased':
-                this.loadPurchased();
-                break;
-            case 'wishlist':
-                this.loadWishlist();
-                break;
-            case 'reviews':
-                this.loadReviews();
-                break;
+            case 'overview':  this.loadOverview();  break;
+            case 'bidding':   this.loadBidding();   break;
+            case 'selling':   this.loadSelling();   break;
+            case 'purchased': this.loadPurchased(); break;
+            case 'wishlist':  this.loadWishlist();  break;
+            case 'reviews':   this.loadReviews();   break;
         }
     }
-    
-    // Load overview content
+
+    /* ====== 개요 ====== */
     loadOverview() {
-        const user = authManager.getUser();
-        if (!user) return;
-        
-        // Load recent activity
         this.loadRecentActivity();
-        
-        // Load points history
-        this.loadPointsHistory();
+        this.loadPointsHistory(0);
     }
-    
-    // Load recent activity
+
+    /* 최근 활동 */
     loadRecentActivity() {
-        const activityList = document.getElementById('recentActivity');
-        if (!activityList) return;
-        
-        const user = authManager.getUser();
-        const userBids = MOCK_AUCTION_ITEMS.filter(item => 
-            item.bids.some(bid => bid.userId === user.id)
-        ).slice(0, 5);
-        
-        if (userBids.length === 0) {
-            activityList.innerHTML = '<p style="text-align: center; color: #6b7280;">최근 활동이 없습니다.</p>';
-            return;
-        }
-        
-        activityList.innerHTML = userBids.map(item => {
-            const lastBid = item.bids.find(bid => bid.userId === user.id);
-            return `
-                <div class="activity-item">
-                    <div class="activity-icon">💰</div>
-                    <div class="activity-content">
-                        <div class="activity-title">${item.name} 입찰</div>
-                        <div class="activity-time">${formatPrice(lastBid.amount)} • ${this.formatTime(lastBid.time)}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        const box = $('#recentActivity');
+        if (!box) return;
+        fetch('/api/my-page/recent-activities')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(items => {
+                box.innerHTML = items.length
+                    ? items.map(it => {
+                        const sign   = it.pointChange > 0 ? '+' : '';
+                        const amount = sign + formatPrice(it.pointChange);
+                        const time   = this.formatTime(new Date(it.changeDate));
+                        return `
+                          <div class="activity-item">
+                              <div class="activity-icon">💰</div>
+                              <div class="activity-content">
+                                  <div class="activity-title">${it.note}</div>
+                                  <div class="activity-time">${amount} • ${time}</div>
+                              </div>
+                          </div>`;
+                    }).join('')
+                    : '<p style="text-align:center;color:#6b7280;">최근 활동이 없습니다.</p>';
+            })
+            .catch(() => box.innerHTML =
+                '<p class="error">데이터를 불러오지 못했습니다.</p>');
     }
-    
-    // Load points history
-    loadPointsHistory() {
-        const pointsHistory = document.getElementById('pointsHistory');
-        if (!pointsHistory) return;
-        
-        // Mock points history
-        const history = [
-            { type: 'charge', amount: 10000000, description: '계좌이체 충전', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
-            { type: 'purchase', amount: -8600000, description: "'빈티지 롤렉스' 낙찰", date: new Date(Date.now() - 10 * 60 * 1000) },
-            { type: 'bid_place', amount: -1600000, description: "'사이버펑크 그래픽카드' 입찰", date: new Date(Date.now() - 3 * 60 * 60 * 1000) },
-            { type: 'sale', amount: 250000, description: "'슈퍼 패미컴' 판매 완료", date: new Date(Date.now() - 1 * 60 * 60 * 1000) }
-        ];
-        
-        pointsHistory.innerHTML = history.map(item => `
-            <div class="points-item">
-                <div class="points-info">
-                    <div class="points-description">${item.description}</div>
-                    <div class="points-date">${this.formatTime(item.date)}</div>
-                </div>
-                <div class="points-amount ${item.amount > 0 ? 'positive' : 'negative'}">
-                    ${item.amount > 0 ? '+' : ''}${formatPrice(item.amount)}
-                </div>
-            </div>
-        `).join('');
+
+    /* 포인트 내역 + 페이지네이션 */
+    loadPointsHistory(page = 0) {
+        this.pointsPage = page;
+        const list  = $('#pointsHistory');
+        const pager = $('#pointsPager');
+        if (!list) return;
+
+        fetch(`/api/my-page/point-history?page=${page}&size=10`)
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(d => {
+                list.innerHTML = d.content.length
+                    ? d.content.map(it => {
+                        const sign = it.pointChange > 0 ? '+' : '';
+                        return `
+                          <div class="points-item">
+                              <div class="points-info">
+                                  <div class="points-description">${it.note}</div>
+                                  <div class="points-date">${this.formatTime(new Date(it.changeDate))}</div>
+                              </div>
+                              <div class="points-amount ${it.pointChange>0?'positive':'negative'}">
+                                  ${sign}${formatPrice(it.pointChange)} P
+                              </div>
+                          </div>`;
+                    }).join('')
+                    : '<p style="text-align:center;color:#6b7280;">포인트 내역이 없습니다.</p>';
+
+                if (pager) {
+                    pager.innerHTML = this.renderPager(d.page, d.totalPages);
+                    pager.querySelectorAll('[data-page]').forEach(btn =>
+                        btn.addEventListener('click', () =>
+                            this.loadPointsHistory(Number(btn.dataset.page))));
+                }
+            })
+            .catch(() => {
+                list.innerHTML = '<p class="error">불러오기 실패</p>';
+                if (pager) pager.innerHTML = '';
+            });
     }
-    
-    // Load bidding history
+    renderPager(cur, total) {
+        if (total <= 1) return '';
+        const prev = cur - 1, next = cur + 1;
+        return `
+          <button ${prev<0 ? 'disabled':''} data-page="${prev}">이전</button>
+          <span>${cur+1} / ${total}</span>
+          <button ${next>=total?'disabled':''} data-page="${next}">다음</button>`;
+    }
+
+    /* ====== 입찰 내역 ====== */
     loadBidding() {
-        const biddingList = document.getElementById('biddingList');
-        if (!biddingList) return;
-        
-        const user = authManager.getUser();
-        const userBids = MOCK_AUCTION_ITEMS.filter(item => 
-            item.bids.some(bid => bid.userId === user.id)
-        );
-        
-        if (userBids.length === 0) {
-            biddingList.innerHTML = '<p style="text-align: center; color: #6b7280;">입찰 내역이 없습니다.</p>';
-            return;
-        }
-        
-        biddingList.innerHTML = userBids.map(item => {
-            const userBid = item.bids.find(bid => bid.userId === user.id);
-            const currentPrice = getCurrentPrice(item);
-            const isWinner = item.winnerId === user.id;
-            
-            return `
-                <div class="list-item">
-                    <img src="${item.images[0]}" alt="${item.name}" class="list-item-image">
-                    <div class="list-item-content">
-                        <div class="list-item-title">${item.name}</div>
-                        <div class="list-item-price">${formatPrice(currentPrice)}</div>
-                        <span class="list-item-status ${item.status === 'active' ? 'active' : item.status === 'sold' ? 'sold' : 'ended'}">
-                            ${item.status === 'active' ? '진행중' : item.status === 'sold' ? (isWinner ? '낙찰' : '낙찰실패') : '종료'}
-                        </span>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        const list = $('#biddingList');
+        if (!list) return;
+        fetch('/api/my-page/bid-history')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(rows => {
+                if (rows.length === 0) {
+                    list.innerHTML = '<p style="text-align:center;color:#6b7280;">입찰 내역이 없습니다.</p>';
+                    return;
+                }
+                list.innerHTML = rows.map(it => {
+                    const price = formatPrice(it.highestBid);
+                    const cls   = it.transactionStatus === 'active'
+                        ? 'active'
+                        : (it.isWinner ? 'sold' : 'ended');
+                    const txt   = it.transactionStatus === 'active'
+                        ? '진행중'
+                        : (it.isWinner ? '낙찰' : '낙찰실패');
+                    return `
+                      <div class="list-item">
+                          <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                          <div class="list-item-content">
+                              <div class="list-item-title">${it.productName}</div>
+                              <div class="list-item-price">${price}</div>
+                              <span class="list-item-status ${cls}">${txt}</span>
+                          </div>
+                      </div>`;
+                }).join('');
+            })
+            .catch(() => list.innerHTML =
+                '<p class="error">데이터를 불러오지 못했습니다.</p>');
     }
-    
-    // Load selling history
+
+    /* ====== 판매 내역 ====== */
     loadSelling() {
-        const sellingList = document.getElementById('sellingList');
-        if (!sellingList) return;
-        
-        const user = authManager.getUser();
-        const userItems = MOCK_AUCTION_ITEMS.filter(item => item.sellerId === user.id);
-        
-        if (userItems.length === 0) {
-            sellingList.innerHTML = '<p style="text-align: center; color: #6b7280;">판매 내역이 없습니다.</p>';
-            return;
-        }
-        
-        sellingList.innerHTML = userItems.map(item => {
-            const currentPrice = getCurrentPrice(item);
-            
-            return `
-                <div class="list-item">
-                    <img src="${item.images[0]}" alt="${item.name}" class="list-item-image">
-                    <div class="list-item-content">
-                        <div class="list-item-title">${item.name}</div>
-                        <div class="list-item-price">${formatPrice(currentPrice)}</div>
-                        <span class="list-item-status ${item.status === 'active' ? 'active' : item.status === 'sold' ? 'sold' : 'ended'}">
-                            ${item.status === 'active' ? '진행중' : item.status === 'sold' ? '판매완료' : '종료'}
-                        </span>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        const list = $('#sellingList');
+        if (!list) return;
+        fetch('/api/my-page/selling-history')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(rows => {
+                if (rows.length === 0) {
+                    list.innerHTML = '<p style="text-align:center;color:#6b7280;">판매 내역이 없습니다.</p>';
+                    return;
+                }
+                list.innerHTML = rows.map(it => {
+                    const price = formatPrice(it.highestPrice);
+                    const cls   = it.transactionStatus === 'active'
+                        ? 'active'
+                        : (it.transactionStatus === 'sold' ? 'sold' : 'ended');
+                    const txt   = it.transactionStatus === 'active'
+                        ? '진행중'
+                        : (it.transactionStatus === 'sold' ? '판매완료' : '종료');
+                    return `
+                      <div class="list-item">
+                          <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                          <div class="list-item-content">
+                              <div class="list-item-title">${it.productName}</div>
+                              <div class="list-item-price">${price}</div>
+                              <span class="list-item-status ${cls}">${txt}</span>
+                          </div>
+                      </div>`;
+                }).join('');
+            })
+            .catch(() => list.innerHTML =
+                '<p class="error">데이터를 불러오지 못했습니다.</p>');
     }
-    
-    // Load purchased items
+
+    /* ====== 구매 / 찜 / 리뷰 (기존 로직 유지) ====== */
     loadPurchased() {
-        const purchasedList = document.getElementById('purchasedList');
-        if (!purchasedList) return;
-        
-        const user = authManager.getUser();
-        const purchasedItems = MOCK_AUCTION_ITEMS.filter(item => 
-            item.status === 'sold' && item.winnerId === user.id
-        );
-        
-        if (purchasedItems.length === 0) {
-            purchasedList.innerHTML = '<p style="text-align: center; color: #6b7280;">구매 내역이 없습니다.</p>';
-            return;
-        }
-        
-        purchasedList.innerHTML = purchasedItems.map(item => {
-            const winningBid = item.bids.find(bid => bid.userId === user.id);
-            
-            return `
-                <div class="list-item">
-                    <img src="${item.images[0]}" alt="${item.name}" class="list-item-image">
-                    <div class="list-item-content">
-                        <div class="list-item-title">${item.name}</div>
-                        <div class="list-item-price">${formatPrice(winningBid.amount)}</div>
-                        <span class="list-item-status sold">구매완료</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        const list = document.getElementById('purchasedList');
+        if (!list) return;
+
+        fetch('/api/my-page/purchased-history')
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(rows => {
+                if (!rows.length) {
+                    list.innerHTML =
+                        '<p style="text-align:center;color:#6b7280;">구매 내역이 없습니다.</p>';
+                    return;
+                }
+
+                list.innerHTML = rows.map(it => `
+              <div class="list-item">
+                  <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                  <div class="list-item-content">
+                      <div class="list-item-title">${it.productName}</div>
+                      <div class="list-item-price">${formatPrice(it.finalPrice)}</div>
+                      <span class="list-item-status sold">구매완료</span>
+                  </div>
+              </div>
+            `).join('');
+            })
+            .catch(() => {
+                list.innerHTML = '<p class="error">데이터를 불러오지 못했습니다.</p>';
+            });
     }
-    
-    // Load wishlist
+    /* ====== 찜한 상품 ====== */
+    /* ====== 찜한 상품 ====== */
     loadWishlist() {
-        const wishlistGrid = document.getElementById('wishlistGrid');
-        if (!wishlistGrid) return;
-        
-        const user = authManager.getUser();
-        const wishlistItems = MOCK_AUCTION_ITEMS.filter(item => 
-            user.wishlist && user.wishlist.includes(item.id)
-        );
-        
-        if (wishlistItems.length === 0) {
-            wishlistGrid.innerHTML = '<p style="text-align: center; color: #6b7280;">찜한 상품이 없습니다.</p>';
-            return;
-        }
-        
-        auctionCardManager.renderCards(wishlistItems, wishlistGrid);
+        const list = document.getElementById('wishlistList') || document.getElementById('wishlistGrid');
+        if (!list) return;
+
+        fetch('/api/my-page/wishlist')
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(rows => {
+                if (!rows.length) {
+                    list.innerHTML =
+                        '<p style="text-align:center;color:#6b7280;">찜한 상품이 없습니다.</p>';
+                    return;
+                }
+
+                list.innerHTML = rows.map(it => {
+                    const active = it.transactionStatus === 'AUCTIONING';
+                    const cls = active ? 'active' : 'ended';
+                    const txt = active ? '경매중' : '종료';
+
+                    return `
+                  <div class="list-item" style="display:flex;width:100%;align-items:center;">
+                      <img src="${it.imagePath}"
+                           alt="${it.productName}"
+                           class="list-item-image"
+                           onerror="this.onerror=null;this.src='/img/noimage.png';">
+                      <div class="list-item-content">
+                          <div class="list-item-title">${it.productName}</div>
+                          <div class="list-item-price">${formatPrice(it.startingPrice)}</div>
+                          <span class="list-item-status ${cls}">${txt}</span>
+                      </div>
+                  </div>`;
+                }).join('');
+            })
+            .catch(() => {
+                list.innerHTML = '<p class="error">데이터를 불러오지 못했습니다.</p>';
+            });
     }
-    
-    // Load reviews
+    /* ====== 리뷰 ====== */
     loadReviews() {
-        const reviewsList = document.getElementById('reviewsList');
-        if (!reviewsList) return;
-        
-        const user = authManager.getUser();
-        const userReviews = user.reviews || [];
-        
-        if (userReviews.length === 0) {
-            reviewsList.innerHTML = '<p style="text-align: center; color: #6b7280;">받은 리뷰가 없습니다.</p>';
-            return;
-        }
-        
-        reviewsList.innerHTML = userReviews.map(review => {
-            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-            
-            return `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-name">${review.reviewerName}</div>
-                        <div class="review-rating">${stars}</div>
-                    </div>
-                    <div class="review-item-title">${review.itemTitle}</div>
-                    <div class="review-comment">${review.comment}</div>
-                    <div class="review-date">${this.formatTime(review.createdAt)}</div>
-                </div>
-            `;
-        }).join('');
+        const list = document.getElementById('reviewsList');
+        if (!list) return;
+
+        fetch('/api/my-page/reviews')
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(rows => {
+                if (!rows.length) {
+                    list.innerHTML =
+                        '<p style="text-align:center;color:#6b7280;">받은 리뷰가 없습니다.</p>';
+                    return;
+                }
+
+                list.innerHTML = rows.map(it => {
+                    const stars = '★'.repeat(it.rating) + '☆'.repeat(5 - it.rating);
+                    return `
+                  <div class="review-item">
+                      <div class="review-header">
+                          <div class="reviewer-name">${it.reviewerName} 님</div>
+                          <div class="review-rating">${stars}</div>
+                      </div>
+                      <!-- 상품명 요소를 제거했습니다 -->
+                      <div class="review-comment">${it.content}</div>
+                      <div class="review-date">${this.formatTime(new Date(it.reviewDate))}</div>
+                  </div>`;
+                }).join('');
+            })
+            .catch(() => {
+                list.innerHTML = '<p class="error">데이터를 불러오지 못했습니다.</p>';
+            });
     }
-    
-    // Format time
+
+    /* ---------- 공통 시간 포맷 ---------- */
     formatTime(date) {
         const now = new Date();
-        const diff = now.getTime() - date.getTime();
-        const minutes = Math.floor(diff / (1000 * 60));
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        
-        if (minutes < 1) return '방금 전';
-        if (minutes < 60) return `${minutes}분 전`;
-        if (hours < 24) return `${hours}시간 전`;
-        if (days < 7) return `${days}일 전`;
-        
+        const diff = now - date;
+        const m = 60*1e3, h = 60*m, d = 24*h;
+        if (diff < h)  return Math.floor(diff/m)+'분 전';
+        if (diff < d)  return Math.floor(diff/h)+'시간 전';
+        if (diff < 7*d) return Math.floor(diff/d)+'일 전';
         return date.toLocaleDateString('ko-KR');
     }
 }
-
-// Initialize my page when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.myPage = new MyPage();
-}); 
