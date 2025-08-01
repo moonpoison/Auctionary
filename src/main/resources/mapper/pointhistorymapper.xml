@@ -14,7 +14,7 @@
 
     <insert id="insert" parameterType="Point_History">
         INSERT INTO Point_History (history_id, user_id, action_type, point_change, final_point, change_date, note)
-        VALUES (0, #{userId}, #{actionType}, #{pointChange}, #{finalPoint}, NOW(), #{note})
+        VALUES (0, #{userId}, lower(#{actionType}), #{pointChange}, #{finalPoint}, NOW(), #{note})
     </insert>
 
     <update id="update" parameterType="User">
@@ -32,5 +32,12 @@
     <delete id="delete" parameterType="String">
         DELETE FROM User WHERE user_id=#{userId}
     </delete>
+
+    <select id="getLatestPointHistory" parameterType="string" resultType="edu.sm.dto.Point_History">
+        SELECT * FROM Point_History 
+        WHERE user_id = #{userId} 
+        ORDER BY change_date DESC 
+        LIMIT 1
+    </select>
 
 </mapper>

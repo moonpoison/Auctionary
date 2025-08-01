@@ -6,7 +6,8 @@
 
     <!-- Bid DTO 매핑 : 컬럼 → 프로퍼티 -->
     <resultMap id="BidMap" type="edu.sm.dto.Bid">
-        <id     property="productId"  column="product_id"/>
+        <id     property="bidId"      column="bid_id"/>
+        <result property="productId"  column="product_id"/>
         <result property="bidUserId"  column="user_id"/>
         <result property="bidPrice"   column="bid_price"/>
         <result property="bidDate"    column="bid_date"/>
@@ -14,29 +15,46 @@
 
     <!-- 내가 낸 최고가만 조회 -->
     <select id="findByUserId" parameterType="string" resultMap="BidMap">
-        SELECT
-            product_id,
-            user_id,
-            MAX(bid_price) AS bid_price,
-            MAX(bid_date)  AS bid_date
-        FROM Bid
-        WHERE user_id = #{userId}
-        GROUP BY product_id
-        ORDER BY bid_date DESC
+        SELECT 
+            b.bid_id,
+            b.product_id,
+            b.user_id,
+            b.bid_price,
+            b.bid_date
+        FROM Bid b
+        INNER JOIN (
+            SELECT product_id, MAX(bid_price) as max_price
+            FROM Bid 
+            WHERE user_id = #{userId}
+            GROUP BY product_id
+        ) max_bids ON b.product_id = max_bids.product_id 
+                  AND b.bid_price = max_bids.max_price
+        WHERE b.user_id = #{userId}
+        ORDER BY b.bid_date DESC
     </select>
 
-    <!-- ✅ bidMapper.xml 내용 병합 -->
-    <insert id="insertBid" parameterType="edu.sm.dto.Bid">
-        INSERT INTO bid
-            (bid_user_id, product_id, bid_price, bid_date)
+    <!-- 입찰 등록 -->
+    <insert id="insertBid" parameterType="edu.sm.dto.Bid" useGeneratedKeys="true" keyProperty="bidId">
+        INSERT INTO Bid
+            (product_id, user_id, bid_price, bid_date)
         VALUES
-            (#{bidUserId}, #{productId}, #{bidPrice}, #{bidDate})
+            (#{productId}, #{bidUserId}, #{bidPrice}, #{bidDate})
     </insert>
 
-    <select id="selectBidsByProductId" parameterType="int" resultType="edu.sm.dto.Bid">
-        SELECT bid_user_id, product_id, bid_price, bid_date
-        FROM bid
+    <!-- 상품별 입찰 내역 조회 -->
+    <select id="selectBidsByProductId" parameterType="int" resultMap="BidMap">
+        SELECT bid_id, product_id, user_id, bid_price, bid_date
+        FROM Bid
         WHERE product_id = #{productId}
-        ORDER BY bid_date DESC
+        ORDER BY bid_price DESC, bid_date ASC
+    </select>
+    
+    <!-- 상품별 최고 입찰가 조회 -->
+    <select id="getMaxBidByProductId" parameterType="int" resultMap="BidMap">
+        SELECT bid_id, product_id, user_id, bid_price, bid_date
+        FROM Bid
+        WHERE product_id = #{productId}
+        ORDER BY bid_price DESC, bid_date ASC
+        LIMIT 1
     </select>
 </mapper>

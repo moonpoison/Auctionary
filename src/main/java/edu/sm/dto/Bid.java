@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class Bid {
+    private int bidId;
     private String bidUserId;
     private int productId;
     private int bidPrice;

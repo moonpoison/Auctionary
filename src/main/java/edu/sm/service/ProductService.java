@@ -23,4 +23,8 @@ public class ProductService {
     public Product select(int productId) {
         return productRepository.select(productId);
     }
+    
+    public Product getProductById(int productId) {
+        return productRepository.select(productId);
+    }
 }

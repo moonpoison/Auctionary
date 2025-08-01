@@ -91,6 +91,7 @@ public class AuthController {
             
             // 사용자 조회
             User user = accountService.select(userId);
+            user.setPoints(0);
             
             if (user == null) {
                 response.put("success", false);
@@ -103,11 +104,6 @@ public class AuthController {
                 response.put("success", false);
                 response.put("message", "비밀번호가 일치하지 않습니다.");
                 return response;
-            }
-            
-            // points가 null이면 기본값 설정
-            if (user.getPoints() == null) {
-                user.setPoints(1000);
             }
             
             // 세션에 사용자 정보 저장
@@ -177,6 +173,33 @@ public class AuthController {
             System.out.println("No user in session");
             response.put("success", false);
             response.put("message", "로그인되지 않았습니다.");
+        }
+        
+        return response;
+    }
+
+    // 세션 확인 엔드포인트
+    @GetMapping("/check")
+    @ResponseBody
+    public Map<String, Object> checkSession(HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        
+        HttpSession session = request.getSession(false);
+        
+        if (session != null) {
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+                response.put("loggedIn", true);
+                response.put("userId", user.getUserId());
+                response.put("userName", user.getName());
+                response.put("sessionId", session.getId());
+            } else {
+                response.put("loggedIn", false);
+                response.put("message", "세션에 사용자 정보가 없습니다.");
+            }
+        } else {
+            response.put("loggedIn", false);
+            response.put("message", "세션이 없습니다.");
         }
         
         return response;

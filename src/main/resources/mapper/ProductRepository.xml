@@ -70,5 +70,4 @@
         JOIN user u ON p.user_id = u.user_id
         WHERE p.product_id = #{productId}
     </select>
-
 </mapper>

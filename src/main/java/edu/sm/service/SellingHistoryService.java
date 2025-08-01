@@ -24,14 +24,14 @@ public class SellingHistoryService {
             String  productName,
             String  imagePath,
             String  transactionStatus,
-            double  highestPrice,
+            int     highestPrice,
             Timestamp auctionEndDate
     ){}
 
     public List<SellingView> getSellingHistory(String sellerId) {
         return repo.findBySellerId(sellerId).stream()
                 .map(p -> new SellingView(
-                        p.getProductId(),
+                        String.valueOf(p.getProductId()),
                         p.getProductName(),
                         p.getImagePath(),
                         p.getTransactionStatus(),

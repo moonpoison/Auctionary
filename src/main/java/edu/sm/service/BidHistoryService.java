@@ -41,19 +41,19 @@ public class BidHistoryService {
         if (myBids.isEmpty()) return List.of();
 
         // 2) 상품 정보 매핑
-        List<String> ids = myBids.stream()
-                .map(b -> String.valueOf(b.getProductId()))
+        List<Integer> ids = myBids.stream()
+                .map(Bid::getProductId)
                 .distinct()
                 .toList();
 
-        Map<String, Product> prodMap =
+        Map<Integer, Product> prodMap =
                 prodRepo.findByIds(ids).stream()
                         .collect(Collectors.toMap(Product::getProductId, p -> p));
 
         // 3) 최고가 계산 (간단히: myBid가 이미 최고가라고 가정)
         return myBids.stream()
                 .map(b -> {
-                    Product p = prodMap.get(String.valueOf(b.getProductId()));
+                    Product p = prodMap.get(b.getProductId());
                     return new BidHistoryView(
                             String.valueOf(b.getProductId()),
                             p != null ? p.getProductName() : "(삭제됨)",

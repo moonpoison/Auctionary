@@ -6,7 +6,7 @@ class AuctionCard {
 
     // Create auction card HTML
     createCard() {
-        const currentPrice = getCurrentPrice(this.item);
+        const currentPrice = this.getCurrentPrice(this.item);
         const timeLeft = formatTimeRemaining(this.item.endDate);
         const user = authManager.getUser();
         const isWishlisted = user && user.wishlist && user.wishlist.includes(this.item.id);
@@ -53,6 +53,11 @@ class AuctionCard {
 
         return card;
     }
+
+    // 현재가 계산 (highestBid 또는 startingPrice 중 높은 값)
+    getCurrentPrice(item) {
+        return item.highestBid || item.startingPrice;
+    }
 }
 
 // Auction Card Manager
@@ -87,14 +92,48 @@ class AuctionCardManager {
         });
     }
 
-    toggleWishlist(itemId, button) {
-        const wasWishlisted = authManager.toggleWishlist(itemId);
-        if (wasWishlisted) {
-            button.classList.remove('active');
-        } else {
-            button.classList.add('active');
+    async toggleWishlist(itemId, button) {
+        // 로그인 상태 확인
+        const savedUser = localStorage.getItem('currentUser');
+        if (!savedUser) {
+            alert('로그인이 필요합니다.');
+            return;
         }
-        // TODO: 백엔드에 위시리스트 상태 반영 추가 가능
+
+        try {
+            const response = await fetch(`/api/wishlist/${itemId}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('찜 처리 결과:', result);
+                
+                // 서버 응답에 따라 버튼 상태 업데이트
+                if (result.action === 'added') {
+                    button.classList.add('active');
+                } else if (result.action === 'removed') {
+                    button.classList.remove('active');
+                }
+                
+                // 메인페이지의 찜 개수 업데이트
+                if (window.auctionApp && window.auctionApp.updateWishlistCount) {
+                    await window.auctionApp.updateWishlistCount();
+                }
+                
+                // 상품카드의 찜 개수 업데이트
+                if (window.auctionApp && window.auctionApp.updateProductWishlistCounts) {
+                    await window.auctionApp.updateProductWishlistCounts();
+                    window.auctionApp.renderAuctionGrid();
+                }
+            } else {
+                alert('찜 처리 중 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('찜 처리 중 오류:', error);
+            alert('찜 처리 중 오류가 발생했습니다.');
+        }
     }
 
     updateTimers(items) {

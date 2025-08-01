@@ -215,12 +215,13 @@ class MyPage {
                 }
                 list.innerHTML = rows.map(it => {
                     const price = formatPrice(it.highestPrice);
-                    const cls   = it.transactionStatus === 'active'
+                    console.log(it.productName+it.transactionStatus);
+                    const cls   = it.transactionStatus === 'AUCTIONING'
                         ? 'active'
-                        : (it.transactionStatus === 'sold' ? 'sold' : 'ended');
-                    const txt   = it.transactionStatus === 'active'
+                        : (it.transactionStatus === 'SOLD' ? 'sold' : 'ended');
+                    const txt   = it.transactionStatus === 'AUCTIONING'
                         ? '진행중'
-                        : (it.transactionStatus === 'sold' ? '판매완료' : '종료');
+                        : (it.transactionStatus === 'SOLD' ? '판매완료' : '종료');
                     return `
                       <div class="list-item">
                           <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">

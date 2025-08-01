@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/auction-card.css">
+
+
 </head>
 <body>
     <!-- Header -->
@@ -37,12 +39,18 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </button>
-                    <a href="/points" class="nav-btn" id="pointsBtn">
+                    <a href="points" class="nav-btn active" id="pointsBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect width="20" height="12" x="2" y="6" rx="2"/>
                             <circle cx="12" cy="12" r="4"/>
                         </svg>
                         <span class="points-text">0 P</span>
+                    </a>
+                    <a href="/my-page" class="nav-btn" id="wishlistBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        <span class="wishlist-count">0</span>
                     </a>
                     <a href="/sell" class="nav-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -104,11 +112,29 @@
         </div>
     </div>
 
+    <c:if test="${not empty user}">
+        <input type="hidden" id="serverFinalPoint" value="${user.points}">
+    </c:if>
+
+
     <script src="/js/mock-data.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/chat.js"></script>
     <script src="/js/auction-card.js"></script>
+    <script src="/js/points.js"></script>
     <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (authManager && typeof authManager.init === 'function') {
+                await authManager.init();
+                // ✅ localStorage 값이 존재하면 강제로 UI 갱신
+                if (authManager.isLoggedIn()) {
+                    authManager.updateUI();
+                    console.log('✅ index.jsp: localStorage 기반으로 UI 강제 갱신 완료');
+                }
+            }
+        });
+    </script>
 </body>
 </html> 

@@ -70,6 +70,50 @@
                     <h2>상품 정보를 불러오는 중...</h2>
                 </div>
             </div>
+            
+            <!-- 입찰 내역 탭 -->
+            <div class="auction-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="bids">입찰 내역</button>
+                    <button class="tab-button" data-tab="details">상품 상세</button>
+                    <button class="tab-button" data-tab="reviews">판매자 리뷰</button>
+                </div>
+                
+                <div class="tab-content active" id="bidsTab">
+                    <div id="bidHistory">
+                        <!-- 입찰 내역이 여기에 로드됩니다 -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="detailsTab">
+                    <div class="product-details">
+                        <h3>상품 상세 정보</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">카테고리</span>
+                                <span class="detail-value" id="categoryValue">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">상태</span>
+                                <span class="detail-value" id="statusValue">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">배송</span>
+                                <span class="detail-value">무료배송</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="reviewsTab">
+                    <div class="seller-reviews">
+                        <h3>판매자 리뷰</h3>
+                        <div class="review-list" id="reviewList">
+                            <!-- 리뷰가 여기에 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 

@@ -21,4 +21,29 @@ public class BidService {
     public List<Bid> getBidsByProductId(int productId) {
         return bidRepository.selectBidsByProductId(productId);
     }
+    
+    public List<Bid> getUserBids(String userId) {
+        return bidRepository.findByUserId(userId);
+    }
+    
+    public int getCurrentMaxBid(int productId) {
+        List<Bid> bids = getBidsByProductId(productId);
+        if (bids.isEmpty()) {
+            return 0;
+        }
+        return bids.stream()
+                .mapToInt(Bid::getBidPrice)
+                .max()
+                .orElse(0);
+    }
+    
+    public Bid getHighestBid(int productId) {
+        List<Bid> bids = getBidsByProductId(productId);
+        if (bids.isEmpty()) {
+            return null;
+        }
+        return bids.stream()
+                .max((b1, b2) -> Integer.compare(b1.getBidPrice(), b2.getBidPrice()))
+                .orElse(null);
+    }
 }
