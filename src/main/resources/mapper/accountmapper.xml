@@ -13,8 +13,8 @@
     </select>
 
     <insert id="insert" parameterType="User">
-        INSERT INTO User (user_id, name, password, birth_date, phone_number, email, role, created_at, updated_at)
-        VALUES (#{userId}, #{name}, #{password}, #{birthDate}, #{phoneNumber}, #{email}, #{role}, #{createdAt}, #{updatedAt})
+        INSERT INTO User (user_id, name, password, birth_date, phone_number, email, role)
+        VALUES (#{userId}, #{name}, #{password}, #{birthDate}, #{phoneNumber}, #{email}, #{role})
     </insert>
 
     <update id="update" parameterType="User">

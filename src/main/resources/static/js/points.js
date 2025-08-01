@@ -80,20 +80,6 @@ class PointsManager {
                 pointsTextElement.textContent = points.toLocaleString() + ' P';
             }
         }
-        this.updateUserPointsFromDOM();
-    }
-    updateUserPointsFromDOM() {
-        if (authManager && authManager.isLoggedIn()) {
-            const points = parseInt(pointsElement.value);
-            if (!isNaN(points)) {
-                const user = authManager.getUser();
-                if (user) {
-                    user.points = points;
-                    authManager.saveUser(user); // localStorage 반영
-                    console.log('포인트가 사용자 정보에 갱신되었습니다:', points);
-                }
-            }
-        }
     }
 
 
@@ -101,7 +87,7 @@ class PointsManager {
     loadPointsHistory() {
         const historyList = document.getElementById('pointsHistoryList');
         if (!historyList) return;
-
+        console.log('Loading points history...');
         fetch('/points/history')
             .then(response => response.json())
             .then(historyData => {

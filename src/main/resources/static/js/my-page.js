@@ -189,7 +189,7 @@ class MyPage {
                         : (it.isWinner ? '낙찰' : '낙찰실패');
                     return `
                       <div class="list-item">
-                          <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                          <img src="images/${it.imagePath}" alt="${it.productName}" class="list-item-image">
                           <div class="list-item-content">
                               <div class="list-item-title">${it.productName}</div>
                               <div class="list-item-price">${price}</div>
@@ -224,7 +224,7 @@ class MyPage {
                         : (it.transactionStatus === 'SOLD' ? '판매완료' : '종료');
                     return `
                       <div class="list-item">
-                          <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                          <img src="/images/${it.imagePath}" alt="${it.productName}" class="list-item-image">
                           <div class="list-item-content">
                               <div class="list-item-title">${it.productName}</div>
                               <div class="list-item-price">${price}</div>
@@ -253,7 +253,7 @@ class MyPage {
 
                 list.innerHTML = rows.map(it => `
               <div class="list-item">
-                  <img src="${it.imagePath}" alt="${it.productName}" class="list-item-image">
+                  <img src="/images/${it.imagePath}" alt="${it.productName}" class="list-item-image">
                   <div class="list-item-content">
                       <div class="list-item-title">${it.productName}</div>
                       <div class="list-item-price">${formatPrice(it.finalPrice)}</div>
@@ -288,7 +288,7 @@ class MyPage {
 
                     return `
                   <div class="list-item" style="display:flex;width:100%;align-items:center;">
-                      <img src="${it.imagePath}"
+                      <img src="/images/${it.imagePath}"
                            alt="${it.productName}"
                            class="list-item-image"
                            onerror="this.onerror=null;this.src='/img/noimage.png';">
