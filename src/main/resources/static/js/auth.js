@@ -14,7 +14,10 @@ class AuthManager {
             console.log('Already initialized, returning');
             return;
         }
-        
+        const savedUser = Storage.get('currentUser');
+        if (savedUser) {
+            this.currentUser = savedUser; // ✅ localStorage 값 우선
+        }
         console.log('Starting initialization...');
         console.log('Calling checkServerSession...');
         
@@ -94,7 +97,17 @@ class AuthManager {
             this.currentUser = savedUser;
         }
     }
-    
+
+    updatePoints(points) {
+        if (this.isLoggedIn() && this.currentUser) {
+            this.currentUser.points = points;
+            Storage.set('currentUser', this.currentUser);
+            this.updateUI();
+            console.log(`✅ User points updated: ${points}`);
+        }
+    }
+
+
     // Save user to localStorage
     saveUser(user) {
         console.log('=== saveUser called ===');
@@ -121,36 +134,31 @@ class AuthManager {
     
     // Login user
     async login(userData) {
-        console.log('=== login called ===');
-        console.log('Login data:', userData);
-        
         try {
             const response = await fetch('/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include', // 쿠키 포함
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(userData)
             });
-            
-            console.log('Response status:', response.status);
-            console.log('Response ok:', response.ok);
-            
+
             const result = await response.json();
-            console.log('Login response:', result);
-            
+
             if (result.success && result.user) {
-                console.log('Login successful, saving user...');
-                console.log('User data from server:', result.user);
-                this.saveUser(result.user);
-                console.log('User saved, updating UI...');
+                this.saveUser(result.user); // 초기 저장
+
+                try {
+                    const pointRes = await fetch('/points/current', { credentials: 'include' });
+                    const pointData = await pointRes.json();
+                    if (pointData.success) {
+                        this.updatePoints(pointData.points); // 최신 포인트 반영
+                    }
+                } catch (error) {
+                    console.error('포인트 갱신 실패:', error);
+                }
+
                 this.updateUI();
-                console.log('UI updated, login complete');
                 return true;
-            } else {
-                console.log('Login failed:', result.message);
-                console.log('Result object:', result);
             }
             return false;
         } catch (error) {
@@ -247,10 +255,11 @@ class AuthManager {
                 const pointsText = pointsBtn.querySelector('.points-text');
                 console.log('Points text element:', pointsText);
                 console.log('User points:', this.currentUser ? this.currentUser.points : 'null');
-                
-                if (pointsText && this.currentUser && this.currentUser.points) {
-                    pointsText.textContent = this.currentUser.points.toLocaleString() + ' P';
-                    console.log('Points updated to:', this.currentUser.points.toLocaleString() + ' P');
+
+                if (pointsText && this.currentUser) {
+                    const pointsValue = (typeof this.currentUser.points === 'number') ? this.currentUser.points : 0;
+                    pointsText.textContent = pointsValue.toLocaleString() + ' P';
+                    console.log('Points updated to:', pointsValue.toLocaleString() + ' P');
                 } else if (pointsText) {
                     pointsText.textContent = '0 P';
                     console.log('Points set to 0 P');

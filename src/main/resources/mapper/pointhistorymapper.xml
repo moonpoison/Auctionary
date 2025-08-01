@@ -14,7 +14,7 @@
 
     <insert id="insert" parameterType="Point_History">
         INSERT INTO Point_History (history_id, user_id, action_type, point_change, final_point, change_date, note)
-        VALUES (0, #{userId}, #{actionType}, #{pointChange}, #{finalPoint}, NOW(), #{note})
+        VALUES (0, #{userId}, lower(#{actionType}), #{pointChange}, #{finalPoint}, NOW(), #{note})
     </insert>
 
     <update id="update" parameterType="User">

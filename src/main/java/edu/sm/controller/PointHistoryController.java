@@ -87,4 +87,23 @@ public class PointHistoryController {
         return list;
     }
 
+    @GetMapping("/current")
+    @ResponseBody
+    public Map<String, Object> getCurrentPoints(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.put("success", false);
+            return response;
+        }
+        try {
+            int finalPoint = pointHistoryService.select(user.getUserId());
+            response.put("success", true);
+            response.put("points", finalPoint);
+        } catch (Exception e) {
+            response.put("success", false);
+        }
+        return response;
+    }
+
 }

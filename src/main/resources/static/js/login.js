@@ -8,38 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Handle login form submission
-async function handleLogin(e) {
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const userId = formData.get('userId');
-    const password = formData.get('password');
-    
-    // Simple validation
-    if (!userId || !password) {
-        showMessage('아이디와 비밀번호를 입력해주세요.', 'error');
-        return;
+
+    const userId = document.getElementById('userId').value;
+    const password = document.getElementById('password').value;
+
+    const success = await authManager.login({ userId, password });
+    if (success) {
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 300); // updatePoints 완료 시간 확보
+    } else {
+        alert('로그인 실패');
     }
-    
-    try {
-        const success = await authManager.login({
-            userId: userId,
-            password: password
-        });
-        
-        if (success) {
-            showMessage('로그인 성공! 메인 페이지로 이동합니다.', 'success');
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
-        } else {
-            showMessage('아이디 또는 비밀번호가 일치하지 않습니다.', 'error');
-        }
-    } catch (error) {
-        showMessage('로그인 중 오류가 발생했습니다.', 'error');
-        console.error('Login error:', error);
-    }
-}
+});
+
 
 // Login with demo account
 async function loginWithDemo(userId) {

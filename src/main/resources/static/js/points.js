@@ -80,6 +80,20 @@ class PointsManager {
                 pointsTextElement.textContent = points.toLocaleString() + ' P';
             }
         }
+        this.updateUserPointsFromDOM();
+    }
+    updateUserPointsFromDOM() {
+        if (authManager && authManager.isLoggedIn()) {
+            const points = parseInt(pointsElement.value);
+            if (!isNaN(points)) {
+                const user = authManager.getUser();
+                if (user) {
+                    user.points = points;
+                    authManager.saveUser(user); // localStorage 반영
+                    console.log('포인트가 사용자 정보에 갱신되었습니다:', points);
+                }
+            }
+        }
     }
 
 
@@ -128,7 +142,7 @@ class PointsManager {
                 return 'charge';
             case 'withdraw':
                 return 'withdraw';
-            case 'bid_place':
+            case 'bid':
                 return 'bid';
             case 'purchase':
                 return 'purchase';
@@ -146,7 +160,7 @@ class PointsManager {
                 return '충전';
             case 'withdraw':
                 return '출금';
-            case 'bid_place':
+            case 'bid':
                 return '입찰';
             case 'purchase':
                 return '구매';
@@ -233,6 +247,13 @@ class PointsManager {
                     if (pointsTextElement) {
                         pointsTextElement.textContent = data.finalPointAfterCharge.toLocaleString() + ' P';
                     }
+                    if (authManager && authManager.isLoggedIn()) {
+                        const user = authManager.getUser();
+                        if (user) {
+                            user.points = data.finalPointAfterCharge;
+                            authManager.saveUser(user);
+                        }
+                    }
                 } else {
                     alert('충전 요청 처리 중 오류가 발생했습니다.');
                 }
@@ -280,6 +301,13 @@ class PointsManager {
                     }
                     if (pointsTextElement) {
                         pointsTextElement.textContent = data.finalPointAfterWithdraw.toLocaleString() + ' P';
+                    }
+                    if (authManager && authManager.isLoggedIn()) {
+                        const user = authManager.getUser();
+                        if (user) {
+                            user.points = data.finalPointAfterCharge;
+                            authManager.saveUser(user);
+                        }
                     }
 
                     this.loadPointsHistory();

@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8080
   servlet:
     encoding:
       charset: UTF-8
@@ -24,8 +24,8 @@ spring:
       suffix: .jsp
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/action?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
+    url: jdbc:mysql://192.168.0.64:3306/auctionary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: tester
     password: 1234
 
 mybatis:
